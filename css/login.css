@@ -1,0 +1,308 @@
+
+/* ==============================
+   CONFIGURAÇÕES GERAIS
+============================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+
+    background:
+        linear-gradient(rgba(20, 29, 55, 0.35), rgba(20, 29, 55, 0.35)),
+        url("../imagens/ceu-estrelado.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 30px;
+}
+
+
+/* ==============================
+   CONTAINER PRINCIPAL
+============================== */
+
+.login-container {
+    width: 100%;
+    max-width: 1000px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    background: rgba(216, 198, 228, 0.42);
+
+    border-radius: 30px;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    box-shadow: 0 15px 40px rgba(90, 75, 100, 0.22);
+
+    overflow: hidden;
+
+    backdrop-filter: blur(6px);
+}
+
+
+/* ==============================
+   ÁREA DE APRESENTAÇÃO
+============================== */
+
+.login-intro {
+    min-height: 600px;
+
+    padding: 60px 50px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    background: linear-gradient(
+        145deg,
+        rgba(28, 39, 68, 0.88),
+        rgba(41, 54, 90, 0.86)
+    );
+}
+
+/* ==============================
+   LOGO
+============================== */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 25px;
+}
+
+.logo h1 {
+    font-family: Georgia, serif;
+
+    font-size: 3.2rem;
+
+    font-weight: 500;
+
+    color: #f6e9b5;
+
+    letter-spacing: 1px;
+}
+
+.logo-estrelas {
+    color: #c6a95c;
+
+    font-size: 1.5rem;
+}
+
+
+/* ==============================
+   TEXTO DA APRESENTAÇÃO
+============================== */
+
+.login-intro h2 {
+    font-family: Georgia, serif;
+
+    font-size: 1.5rem;
+
+    font-weight: 500;
+
+    color: #f4eaf7;
+
+    margin-bottom: 18px;
+}
+
+.login-intro p {
+    max-width: 350px;
+
+    font-size: 1rem;
+
+    line-height: 1.7;
+
+    color: #d9d3e3;
+}
+
+
+/* ==============================
+   CARD DE LOGIN
+============================== */
+
+.login-card {
+    min-height: 600px;
+
+    padding: 60px 55px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.login-card h2 {
+    font-family: Georgia, serif;
+
+    font-size: 2rem;
+
+    font-weight: 500;
+
+    color: #62556a;
+
+    margin-bottom: 10px;
+}
+
+.login-subtitle {
+    color: #817780;
+
+    font-size: 0.95rem;
+
+    line-height: 1.5;
+
+    margin-bottom: 35px;
+}
+
+
+/* ==============================
+   FORMULÁRIO
+============================== */
+
+.form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+
+    font-size: 0.9rem;
+
+    font-weight: 600;
+
+    color: #665c69;
+}
+
+.form-group input {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 1px solid #ddd3df;
+
+    border-radius: 12px;
+
+    background: #fff;
+
+    color: #4d4652;
+
+    font-size: 0.95rem;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.form-group input::placeholder {
+    color: #aaa0aa;
+}
+
+.form-group input:focus {
+    border-color: #b9a3c4;
+
+    box-shadow: 0 0 0 3px rgba(185, 163, 196, 0.15);
+}
+
+
+/* ==============================
+   ESQUECI A SENHA
+============================== */
+
+.forgot-password {
+    text-align: right;
+
+    margin-top: -8px;
+
+    margin-bottom: 25px;
+}
+
+.forgot-password a {
+    color: #897294;
+
+    font-size: 0.85r
+}
+
+
+/* ==============================
+   BOTÃO DE LOGIN
+============================== */
+
+.login-card .btn-login {
+    width: 100%;
+    padding: 14px;
+
+    border: none;
+    border-radius: 13px;
+
+    background: #8f779b !important;
+    color: #ffffff !important;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+    box-shadow: 0 5px 12px rgba(100, 80, 110, 0.18);
+}
+
+.login-card .btn-login:hover {
+    background: #796183 !important;
+
+    color: #ffffff !important;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 7px 15px rgba(100, 80, 110, 0.22);
+}
+
+/* ==============================
+   TEXTO DE REGISTRO
+============================== */
+
+.register-text {
+    margin-top: 24px;
+
+    text-align: center;
+
+    font-size: 0.95rem;
+    color: #77717d;
+}
+
+.register-text a {
+    color: #7d6488;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.register-text a:hover {
+    color: #5f4869;
+    text-decoration: underline;
+}
