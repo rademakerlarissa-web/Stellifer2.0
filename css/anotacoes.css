@@ -1,0 +1,169 @@
+
+
+/* =========================================================
+   1. ÚLTIMAS ANOTAÇÕES
+   ========================================================= */
+
+.notes-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+
+.note-card {
+
+    padding:
+        25px;
+
+    border:
+        1px solid var(--borda);
+
+    border-radius:
+        var(--raio-medio);
+
+    background:
+        rgba(255, 253, 248, 0.94);
+
+    box-shadow:
+        var(--sombra);
+
+    position: relative;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/*
+   Pequenos tons alternados.
+*/
+
+.note-card:nth-child(1) {
+    background:
+        linear-gradient(
+            145deg,
+            #fffdf8,
+            var(--rosa-claro)
+        );
+}
+
+
+.note-card:nth-child(2) {
+    background:
+        linear-gradient(
+            145deg,
+            #fffdf8,
+            var(--lilas-claro)
+        );
+}
+
+
+.note-card:nth-child(3) {
+    background:
+        linear-gradient(
+            145deg,
+            #fffdf8,
+            var(--pessego-claro)
+        );
+}
+
+
+.note-card::before {
+
+    content:
+        "✦";
+
+    position: absolute;
+
+    top: 18px;
+
+    right: 20px;
+
+    color:
+        var(--amarelo);
+
+    font-size: 18px;
+}
+
+
+.note-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        var(--sombra-hover);
+}
+
+
+.note-date {
+
+    display: inline-block;
+
+    margin-bottom: 12px;
+
+    color:
+        var(--rosa-escuro);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+
+.note-card h3 {
+
+    margin-bottom: 10px;
+
+    color:
+        var(--texto);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 20px;
+
+    font-weight: 500;
+}
+
+
+.note-card p {
+
+    margin-bottom: 18px;
+
+    color:
+        var(--texto-suave);
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+.note-card a {
+
+    color:
+        var(--verde-escuro);
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.note-card a:hover {
+
+    text-decoration: underline;
+}
+
+

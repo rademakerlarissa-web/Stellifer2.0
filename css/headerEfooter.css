@@ -1,0 +1,144 @@
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
+header {
+
+    width: 100%;
+
+    padding: 17px 6%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    background-color:
+        rgba(255, 253, 248, 0.82);
+
+    border-bottom:
+        1px solid rgba(220, 216, 205, 0.75);
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    backdrop-filter: blur(12px);
+}
+
+
+/* Logo */
+
+.logo {
+
+    color: var(--verde-escuro);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 25px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.4px;
+}
+
+
+.logo::before {
+
+    content: "✦";
+
+    color: var(--amarelo);
+
+    margin-right: 8px;
+
+    font-size: 18px;
+}
+
+
+/* Navegação */
+
+nav {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 30px;
+}
+
+
+nav a {
+
+    color: var(--texto-suave);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+nav a:hover {
+
+    color: var(--verde-escuro);
+
+    transform:
+        translateY(-1px);
+}
+
+/* =========================================================
+    RODAPÉ
+   ========================================================= */
+
+footer {
+
+    width: 100%;
+
+    margin-top: 100px;
+
+    padding:
+        38px 6%;
+
+    border-top:
+        1px solid var(--borda);
+
+    background:
+        rgba(241, 239, 230, 0.90);
+
+    text-align: center;
+}
+
+
+footer p:first-child {
+
+    margin-bottom: 5px;
+
+    color:
+        var(--verde-escuro);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 17px;
+}
+
+
+footer p:last-child {
+
+    color:
+        var(--texto-suave);
+
+    font-size: 13px;
+}

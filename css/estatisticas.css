@@ -1,0 +1,1008 @@
+/* =====================================================
+   ESTATÍSTICAS
+===================================================== */
+
+.statistics {
+    width: 88%;
+    max-width: 1250px;
+    margin: 70px auto;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.section-title h2 {
+    margin: 0;
+    color: var(--verde-escuro);
+    font-size: 32px;
+}
+
+
+
+/* =====================================================
+   GRID DOS CARDS
+===================================================== */
+
+.statistics-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+}
+
+.status-card {
+    grid-column: 1 / -1;
+}
+
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.stat-card {
+    background: rgba(255, 253, 248, 0.92);
+    border: 1px solid var(--borda);
+    border-radius: 22px;
+    padding: 30px;
+
+    box-shadow: 0 8px 25px rgba(83, 108, 87, 0.07);
+}
+
+.stat-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+
+    color: var(--verde-escuro);
+    font-size: 20px;
+}
+
+.stat-description {
+    margin-top: 0;
+
+    color: var(--texto-suave);
+    font-size: 15px;
+}
+
+
+/* =====================================================
+   DISTRIBUIÇÃO DAS NOTAS
+===================================================== */
+
+.rating-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 25px;
+    margin-top: 22px;
+}
+
+/* GRÁFICO */
+
+.rating-circle {
+    width: 165px;
+    height: 165px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            var(--rosa-escuro) 0% 40%,
+            var(--lilas-escuro) 40% 70%,
+            var(--azul-escuro) 70% 90%,
+            var(--amarelo) 90% 97%,
+            var(--pessego) 97% 100%
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* CENTRO DO GRÁFICO */
+
+.rating-circle-center {
+    width: 112px;
+    height: 112px;
+
+    border-radius: 50%;
+
+    background: var(--fundo-claro);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+.rating-circle-center span {
+    font-size: 18px;
+    letter-spacing: -3px;
+}
+
+.rating-circle-center small {
+    margin-top: 8px;
+
+    color: var(--texto-suave);
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   LEGENDA DAS NOTAS
+===================================================== */
+
+.rating-legend {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 4px 0;
+
+    font-size: 17px;
+}
+
+.legend-item strong {
+    margin-left: auto;
+
+    color: var(--amarelo-escuro);
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.legend-color {
+    width: 13px;
+    height: 13px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+}
+
+.star-5 {
+    background: var(--rosa-escuro);
+}
+
+.star-4 {
+    background: var(--lilas-escuro);
+}
+
+.star-3 {
+    background: var(--azul-escuro);
+}
+
+.star-2 {
+    background: var(--amarelo);
+}
+
+.star-1 {
+    background: var(--pessego);
+}
+
+
+/* =====================================================
+   FREQUÊNCIA SEMANAL
+===================================================== */
+
+.weekly-chart {
+    height: 205px;
+
+    margin-top: 30px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 0 5px;
+
+    border-bottom: 1px solid var(--borda);
+}
+
+.week-day {
+    height: 100%;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.week-day .bar {
+    width: 100%;
+    max-width: 34px;
+
+    min-height: 10px;
+
+    border-radius: 9px 9px 3px 3px;
+
+    background: var(--verde);
+}
+
+.week-day span {
+    font-size: 13px;
+
+    color: var(--texto-suave);
+
+    margin-bottom: -27px;
+}
+
+
+/* =====================================================
+   OBRAS CONCLUÍDAS
+===================================================== */
+
+.completed-number {
+    margin-top: 15px;
+
+    font-size: 52px;
+    font-weight: 600;
+
+    color: var(--verde-escuro);
+}
+
+.completed-description {
+    margin-top: -5px;
+
+    color: var(--texto-suave);
+    font-size: 15px;
+}
+
+
+/* =====================================================
+   TOP 3 OBRAS
+===================================================== */
+
+.top-works {
+    margin-top: 28px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--borda);
+}
+
+.top-works h4 {
+    margin: 0 0 15px;
+
+    font-size: 15px;
+    color: var(--texto);
+}
+
+.top-work {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid rgba(231, 225, 214, 0.7);
+}
+
+.top-work:last-child {
+    border-bottom: none;
+}
+
+.work-position {
+    font-size: 20px;
+
+    width: 30px;
+    text-align: center;
+}
+
+.work-info {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.work-info strong {
+    font-size: 15px;
+    color: var(--texto);
+}
+
+.work-info span {
+    font-size: 13px;
+
+    color: var(--texto-suave);
+
+    margin-top: 3px;
+}
+
+.work-rating {
+    font-size: 14px;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   CARD - STATUS DAS OBRAS
+===================================================== */
+
+.status-card {
+    overflow: hidden;
+
+    text-align: center;
+}
+
+
+/* =====================================================
+   GRÁFICO CIRCULAR
+===================================================== */
+
+.status-circle-container {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 25px;
+}
+
+
+.status-circle {
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            var(--verde-escuro) 0% 66%,
+            var(--azul-escuro) 66% 91%,
+            var(--rosa-escuro) 91% 100%
+        );
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+}
+
+
+/* =====================================================
+   CENTRO DO GRÁFICO
+===================================================== */
+
+.status-circle::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 120px;
+    height: 120px;
+
+    background: var(--fundo-claro);
+
+    border-radius: 50%;
+}
+
+
+.status-circle-center {
+
+    position: relative;
+
+    z-index: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+
+.status-circle-center strong {
+
+    font-size: 32px;
+
+    color: var(--texto);
+}
+
+
+.status-circle-center span {
+
+    font-size: 14px;
+
+    color: var(--texto-suave);
+}
+
+
+/* =====================================================
+   LEGENDA DO STATUS
+===================================================== */
+
+.status-legend {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 35px;
+
+    margin-top: 28px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid var(--borda);
+}
+
+
+.status-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 15px;
+}
+
+
+.status-item strong {
+
+    font-size: 17px;
+
+    color: var(--texto);
+}
+
+
+/* =====================================================
+   BOLINHAS
+===================================================== */
+
+.status-dot {
+
+    width: 11px;
+    height: 11px;
+
+    border-radius: 50%;
+
+    display: block;
+
+    flex-shrink: 0;
+}
+
+
+.status-dot.completed {
+    background: var(--verde-escuro);
+}
+
+
+.status-dot.progress {
+    background: var(--azul-escuro);
+}
+
+
+.status-dot.abandoned {
+    background: var(--rosa-escuro);
+}
+
+/* =====================================================
+   CARD - DESTAQUES
+===================================================== */
+
+.highlights-card {
+
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 28px 32px;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   CABEÇALHO
+===================================================== */
+
+.highlights-header {
+
+    margin-bottom: 25px;
+}
+
+
+.highlights-header h3 {
+
+    margin: 0;
+
+    font-size: 21px;
+
+    color: var(--texto);
+}
+
+
+.highlights-header p {
+
+    margin: 6px 0 0;
+
+    color: var(--texto-suave);
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   LISTA HORIZONTAL
+===================================================== */
+
+.highlights-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    min-width: 0;
+}
+
+.highlight-work {
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.highlight-info {
+    min-width: 0;
+}
+
+
+/* =====================================================
+   CADA DESTAQUE
+===================================================== */
+
+.highlight-work {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    background: var(--fundo-claro);
+
+    border: 1px solid var(--borda);
+
+    border-radius: 18px;
+
+    transition: 0.2s ease;
+}
+
+
+.highlight-work:hover {
+
+    transform: translateY(-3px);
+
+    border-color: var(--verde);
+}
+
+
+/* =====================================================
+   POSIÇÃO
+===================================================== */
+
+.highlight-position {
+    font-size: 30px;
+    grid-row: 1 / 3;
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   INFORMAÇÕES
+===================================================== */
+
+.highlight-info {
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.highlight-info strong {
+    font-size: 18px;
+    color: var(--texto);
+
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+}
+
+
+.highlight-info span {
+
+    margin-top: 3px;
+
+    font-size: 13px;
+
+    color: var(--texto-suave);
+}
+
+
+/* =====================================================
+   NOTA
+===================================================== */
+
+.highlight-rating {
+
+    font-size: 16px;
+
+    white-space: nowrap;
+    grid-column: 2;
+}
+
+.highlights-card {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin-top: 20px;
+    padding: 28px 32px;
+}
+
+
+.highlights-list {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+
+.highlight-work {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    row-gap: 4px;
+
+    padding: 18px;
+
+    background: var(--fundo-claro);
+    border: 1px solid var(--borda);
+    border-radius: 18px;
+
+    transition: 0.2s ease;
+
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+
+.highlight-work:hover {
+    transform: translateY(-3px);
+
+    border-color: var(--verde);
+}
+
+/* =====================================================
+   ESPAÇO APÓS OS DESTAQUES
+===================================================== */
+
+.highlights-card {
+    margin-bottom: 65px;
+}
+
+/* =====================================================
+   AJUSTES DOS DESTAQUES E STATUS NO CELULAR
+===================================================== */
+
+@media (max-width: 650px) {
+
+    /* -------------------------
+       DESTAQUES
+    ------------------------- */
+
+    .highlights-card {
+        width: 100%;
+        padding: 22px 18px;
+    }
+
+    .highlights-list {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .highlight-work {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+
+    /* -------------------------
+       STATUS DAS OBRAS
+    ------------------------- */
+
+    .status-legend {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+}
+
+
+/* =====================================================
+   FILTROS DAS ESTATÍSTICAS
+===================================================== */
+
+.statistics-filters {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+
+/* =====================================================
+   SELETORES DE MÊS E ANO
+===================================================== */
+
+.date-selectors {
+    display: flex;
+    gap: 10px;
+}
+
+.date-selectors select {
+    padding: 10px 36px 10px 14px;
+
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+
+    background: var(--fundo-claro);
+    color: var(--texto);
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    outline: none;
+
+    transition: 0.2s ease;
+
+    appearance: auto;
+}
+
+.date-selectors select:hover {
+    border-color: var(--verde);
+}
+
+.date-selectors select:focus {
+    border-color: var(--verde-escuro);
+
+    box-shadow: 0 0 0 3px rgba(83, 108, 87, 0.12);
+}
+
+
+/* =====================================================
+   BOTÕES DE FILTRO
+===================================================== */
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-button {
+    padding: 9px 14px;
+
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+
+    background: var(--fundo-claro);
+    color: var(--texto);
+
+    font-family: inherit;
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+/* Quando passa o mouse */
+.filter-button:hover {
+    background: var(--verde-claro);
+    border-color: var(--verde);
+}
+
+
+/* Botão selecionado */
+.filter-button.active {
+    background: var(--verde-escuro);
+    border-color: var(--verde-escuro);
+
+    color: white;
+}
+
+
+/* Pequeno efeito ao clicar */
+.filter-button:active {
+    transform: scale(0.97);
+}
+
+
+
+/* =========================================================
+   9. SELETOR DE MÊS
+   ========================================================= */
+
+#month-select {
+
+    padding:
+        9px 13px;
+
+    border:
+        1px solid var(--borda);
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background:
+        var(--fundo-claro);
+
+    color:
+        var(--texto);
+
+    font-size: 14px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+#month-select:focus {
+
+    border-color:
+        var(--verde);
+}
+
+
+
+/* =====================================================
+   AJUSTE FINAL - LEGENDA DA DISTRIBUIÇÃO DAS NOTAS
+===================================================== */
+
+.rating-card .rating-legend {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    grid-template-columns: none !important;
+
+    gap: 10px !important;
+
+    margin-top: 5px;
+}
+
+.rating-card .legend-item {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+
+    gap: 14px !important;
+
+    margin: 4px 0 !important;
+
+    font-size: 20px !important;
+    line-height: 1.4 !important;
+}
+
+.rating-card .legend-item strong {
+    margin-left: auto !important;
+
+    font-size: 20px !important;
+    font-weight: 600 !important;
+
+    color: var(--amarelo-escuro);
+}
+
+.rating-card .legend-color {
+    width: 14px !important;
+    height: 14px !important;
+
+    flex-shrink: 0 !important;
+}
+
+
+
+
+
+/* =====================================================
+   INTERAÇÃO - FREQUÊNCIA DE ANOTAÇÕES
+===================================================== */
+
+.week-day {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.week-day:hover {
+    transform: translateY(-4px);
+}
+
+.week-day:hover .bar {
+    background: var(--verde-escuro);
+}
+
+
+/* =====================================================
+   INFORMAÇÃO DO DIA SELECIONADO
+===================================================== */
+
+.annotation-info {
+    margin-top: 60px;
+    padding: 14px 18px;
+
+    border-radius: 14px;
+
+    background: var(--verde-claro);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+
+    transition: 0.2s ease;
+}
+
+.annotation-info strong {
+    font-size: 17px;
+    color: var(--verde-escuro);
+}
+
+.annotation-info span {
+    margin-top: 8px;
+
+    font-size: 14px;
+    color: var(--texto-suave);
+}
+
+

@@ -1,0 +1,416 @@
+#mascote {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 900;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    will-change: transform;
+}
+
+#mascote .m-svg {
+    position: absolute;
+    top: -125px;
+    left: -60px;
+    display: block;
+    width: 120px;
+    height: 135px;
+    overflow: visible;
+    transform: scale(var(--m-escala, 1));
+    transform-origin: 60px 125px;
+    pointer-events: none;
+}
+
+#mascote .m-hit {
+    fill: transparent;
+    pointer-events: all;
+    cursor: grab;
+    touch-action: none;
+}
+
+#mascote.m-agarrado .m-hit {
+    cursor: grabbing;
+}
+
+.m-svg .m-sombra {
+    fill: rgba(48, 39, 27, 0.2);
+}
+
+.m-svg .m-pele {
+    fill: var(--m-pele, #a06b44);
+}
+
+.m-svg .m-pele-s {
+    fill: var(--m-pele-s, #825737);
+}
+
+.m-svg .m-cabelo {
+    fill: var(--m-cabelo, #23150f);
+}
+
+.m-svg .m-traco-cabelo {
+    fill: none;
+    stroke: var(--m-cabelo, #23150f);
+    stroke-linecap: round;
+    stroke-width: 5;
+}
+
+.m-svg .m-camisa {
+    fill: var(--m-camisa, #f0c75e);
+}
+
+.m-svg .m-calca {
+    fill: var(--m-calca, #5b6f87);
+}
+
+.m-svg .m-sapato {
+    fill: #49352d;
+}
+
+.m-svg .m-estrela-peito {
+    fill: #f7d96a;
+}
+
+.m-svg .m-a-lenco,
+.m-svg .m-a-chapeu,
+.m-svg .m-a-oculos,
+.m-svg .m-a-estrela {
+    display: none;
+}
+
+.m-svg[data-acessorio="lenco"] .m-a-lenco,
+.m-svg[data-acessorio="chapeu"] .m-a-chapeu,
+.m-svg[data-acessorio="oculos"] .m-a-oculos,
+.m-svg[data-acessorio="estrela"] .m-a-estrela {
+    display: initial;
+}
+
+.m-svg[data-cabelo="curto"] .m-h-curto,
+.m-svg[data-cabelo="cacheado"] .m-h-cacheado,
+.m-svg[data-cabelo="afro"] .m-h-afro,
+.m-svg[data-cabelo="topete"] .m-h-topete {
+    display: initial;
+}
+
+.m-svg[data-cabelo="curto"] .m-h-cacheado,
+.m-svg[data-cabelo="curto"] .m-h-afro,
+.m-svg[data-cabelo="curto"] .m-h-topete,
+.m-svg[data-cabelo="cacheado"] .m-h-curto,
+.m-svg[data-cabelo="cacheado"] .m-h-afro,
+.m-svg[data-cabelo="cacheado"] .m-h-topete,
+.m-svg[data-cabelo="afro"] .m-h-curto,
+.m-svg[data-cabelo="afro"] .m-h-cacheado,
+.m-svg[data-cabelo="afro"] .m-h-topete,
+.m-svg[data-cabelo="topete"] .m-h-curto,
+.m-svg[data-cabelo="topete"] .m-h-cacheado,
+.m-svg[data-cabelo="topete"] .m-h-afro {
+    display: none;
+}
+
+.m-svg .m-olhos-fechados path,
+.m-svg .m-olhos-felizes path,
+.m-svg .m-sobr-e,
+.m-svg .m-sobr-d,
+.m-svg .m-nariz,
+.m-svg .m-boca {
+    fill: none;
+    stroke: #4c2b20;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.m-svg .m-sobr-e,
+.m-svg .m-sobr-d {
+    stroke: var(--m-sobr, #1c100c);
+    stroke-width: 2;
+}
+
+.m-svg .m-boca {
+    stroke-width: 1.6;
+}
+
+.m-svg .m-rubor {
+    fill: #f08a7a;
+}
+
+.m-svg .m-ioio-fio {
+    stroke: #6a4a34;
+    stroke-width: 1.4;
+}
+
+.m-svg .m-fx text {
+    fill: #5b754e;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.m-balao {
+    position: fixed;
+    z-index: 901;
+    top: 0;
+    left: 0;
+    max-width: min(250px, calc(100vw - 32px));
+    padding: 9px 13px;
+    border: 1px solid rgba(100, 76, 49, 0.15);
+    border-radius: 15px;
+    background: #fffaf0;
+    box-shadow: 0 5px 18px rgba(48, 39, 27, 0.16);
+    color: #463729;
+    font: 600 14px/1.4 "Nunito", sans-serif;
+    text-align: center;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.m-balao:after {
+    position: absolute;
+    bottom: -7px;
+    left: calc(50% + var(--cauda, 0px));
+    width: 12px;
+    height: 12px;
+    border-right: 1px solid rgba(100, 76, 49, 0.15);
+    border-bottom: 1px solid rgba(100, 76, 49, 0.15);
+    background: #fffaf0;
+    content: "";
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.m-fab {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 1001;
+    display: grid;
+    width: 54px;
+    height: 54px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: #7fa36f;
+    box-shadow: 0 5px 18px rgba(48, 39, 27, 0.22);
+    color: #fffaf0;
+    cursor: pointer;
+    transition: background 160ms ease, transform 160ms ease;
+}
+
+.m-fab:hover {
+    background: #668b58;
+    transform: translateY(-2px);
+}
+
+.m-fab:focus-visible,
+.m-painel button:focus-visible,
+.m-painel input:focus-visible {
+    outline: 3px solid #d7aa4b;
+    outline-offset: 3px;
+}
+
+.m-fab svg {
+    width: 29px;
+    height: 29px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.m-painel {
+    position: fixed;
+    right: 22px;
+    bottom: 88px;
+    z-index: 1000;
+    width: min(370px, calc(100vw - 32px));
+    max-height: min(78vh, 680px);
+    overflow: auto;
+    padding: 18px;
+    border: 1px solid rgba(100, 76, 49, 0.16);
+    border-radius: 20px;
+    background: #fffaf0;
+    box-shadow: 0 12px 36px rgba(48, 39, 27, 0.2);
+    color: #463729;
+    font-family: "Nunito", sans-serif;
+}
+
+.m-painel[hidden] {
+    display: none;
+}
+
+.m-painel-topo {
+    display: flex;
+    min-height: 82px;
+    align-items: center;
+    gap: 12px;
+    padding-right: 34px;
+}
+
+.m-previa {
+    position: relative;
+    flex: 0 0 62px;
+    width: 62px;
+    height: 76px;
+    overflow: hidden;
+}
+
+.m-previa .m-svg {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 72px;
+    height: 81px;
+    overflow: visible;
+    transform: translateX(-50%);
+}
+
+.m-painel-titulos {
+    min-width: 0;
+}
+
+.m-painel-titulos h2 {
+    margin: 0;
+    color: #463729;
+    font: 600 20px/1.2 "Fraunces", serif;
+}
+
+.m-painel-titulos p {
+    margin: 5px 0 0;
+    color: #75644f;
+    font-size: 13px;
+}
+
+.m-fechar {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #75644f;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.m-fechar:hover {
+    background: rgba(127, 163, 111, 0.14);
+}
+
+.m-campos {
+    display: grid;
+    gap: 13px;
+    margin-top: 14px;
+}
+
+.m-campo {
+    display: grid;
+    gap: 6px;
+    color: #594a39;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.m-campo input[type="text"] {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid #ded3bf;
+    border-radius: 10px;
+    background: #fffdf8;
+    color: #463729;
+    font: 600 14px "Nunito", sans-serif;
+}
+
+.m-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.m-chip {
+    padding: 6px 10px;
+    border: 1px solid #ded3bf;
+    border-radius: 999px;
+    background: #fffdf8;
+    color: #594a39;
+    cursor: pointer;
+    font: 600 12px "Nunito", sans-serif;
+}
+
+.m-chip:hover,
+.m-chip.marcado {
+    border-color: #7fa36f;
+    background: #edf3e9;
+    color: #496640;
+}
+
+.m-cor {
+    position: relative;
+    width: 27px;
+    height: 27px;
+    padding: 0;
+    border: 2px solid #fffdf8;
+    border-radius: 50%;
+    background: var(--cor, #ccc);
+    box-shadow: 0 0 0 1px #d4c8b4;
+    cursor: pointer;
+}
+
+.m-cor.marcado {
+    box-shadow: 0 0 0 2px #668b58;
+}
+
+.m-interruptor {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #594a39;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.m-interruptor input {
+    width: 17px;
+    height: 17px;
+    accent-color: #7fa36f;
+}
+
+.m-painel-rodape {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #e9dfce;
+}
+
+.m-restaurar {
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #75644f;
+    cursor: pointer;
+    font: 700 12px "Nunito", sans-serif;
+}
+
+.m-restaurar:hover {
+    background: rgba(127, 163, 111, 0.14);
+    color: #496640;
+}
+
+@media (max-width: 480px) {
+    .m-fab {
+        right: 14px;
+        bottom: 14px;
+    }
+
+    .m-painel {
+        right: 12px;
+        bottom: 78px;
+        width: calc(100vw - 24px);
+        max-height: 78vh;
+        padding: 15px;
+    }
+}

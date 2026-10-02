@@ -1,0 +1,423 @@
+/* =========================================================
+   STELLIFER
+   Diário de experiências literárias e audiovisuais
+
+   Identidade:
+   • cores pastel
+   • natureza
+   • papel / diário
+   • delicado
+   • aconchegante
+   ========================================================= */
+
+
+/* =========================================================
+   1. PALETA
+   ========================================================= */
+
+:root {
+
+    /* Fundos */
+    --fundo: #faf7ef;
+    --fundo-claro: #fffdf8;
+    --fundo-verde: #edf3e9;
+
+    /* Verde */
+    --verde: #9caf9a;
+    --verde-medio: #7f9a80;
+    --verde-escuro: #536c57;
+    --verde-claro: #dfe9dc;
+
+    /* Rosa */
+    --rosa: #e4b9c0;
+    --rosa-escuro: #b77f88;
+    --rosa-claro: #f5e1e4;
+
+    /* Lilás */
+    --lilas: #c9bddc;
+    --lilas-escuro: #83749b;
+    --lilas-claro: #ebe5f2;
+
+    /* Azul */
+    --azul: #aecbd8;
+    --azul-escuro: #688b9b;
+    --azul-claro: #e1edf1;
+
+    /* Amarelo */
+    --amarelo: #e8d59c;
+    --amarelo-escuro: #aa9656;
+    --amarelo-claro: #f3dfaa;
+
+    /* Pêssego */
+    --pessego: #e8c4aa;
+    --pessego-claro: #f6e4d7;
+
+    /* Texto */
+    --texto: #343c35;
+    --texto-suave: #727970;
+
+    /* Bordas */
+    --borda: #e7e1d6;
+
+    /* Sombras */
+    --sombra:
+        0 8px 25px rgba(65, 73, 64, 0.06);
+
+    --sombra-hover:
+        0 14px 32px rgba(65, 73, 64, 0.10);
+
+    /* Cantos */
+    --raio-grande: 26px;
+    --raio-medio: 18px;
+    --raio-pequeno: 11px;
+}
+
+
+/* =========================================================
+   2. RESET
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+
+    background-color: var(--fundo);
+
+    color: var(--texto);
+
+    font-family:
+        "Segoe UI",
+        "Trebuchet MS",
+        Arial,
+        sans-serif;
+
+    line-height: 1.6;
+
+    position: relative;
+
+    isolation: isolate;
+}
+
+/* =========================================================
+   3. FUNDO ILUSTRADO
+   ========================================================= */
+
+/*
+   Coloque sua imagem aqui:
+
+   imagens/fundo-stellifer.png
+
+   A imagem fica MUITO suave e atrás de todo o conteúdo.
+*/
+
+body::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    height: 760px;
+
+    background-image:
+        linear-gradient(
+            to bottom,
+            rgba(250, 247, 239, 0.18),
+            rgba(250, 247, 239, 0.72) 70%,
+            rgba(250, 247, 239, 1)
+        ),
+        url("../imagens/fundo-stellifer.png");
+
+    background-repeat: no-repeat;
+
+    background-position:
+        center top,
+        center top;
+
+    background-size:
+        100% 100%,
+        cover;
+
+    opacity: 0.72;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+/*
+   Isso mantém o conteúdo acima da ilustração.
+*/
+
+header,
+main,
+footer {
+    position: relative;
+    z-index: 1;
+
+}
+
+
+
+/* =========================================================
+   4. ELEMENTOS GERAIS
+   ========================================================= */
+
+a {
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
+button,
+select {
+    font-family: inherit;
+}
+
+
+button {
+    cursor: pointer;
+}
+
+
+main {
+    width: 100%;
+}
+
+
+section {
+    width: 100%;
+}
+
+
+/* =========================================================
+   5. APRESENTAÇÃO
+   ========================================================= */
+
+.welcome {
+
+    width: 88%;
+
+    max-width: 1250px;
+
+    margin:
+        55px auto 75px;
+
+    text-align: left;
+}
+
+
+/* Etiqueta */
+
+.welcome::before {
+
+    content:
+        "MEU DIÁRIO";
+
+    display: inline-block;
+
+    margin-bottom: 15px;
+
+    padding:
+        6px 14px;
+
+    border-radius: 30px;
+
+    background:
+        var(--verde-claro);
+
+    color:
+        var(--verde-escuro);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.6px;
+}
+
+
+.welcome h1 {
+
+    max-width: 850px;
+
+    margin-bottom: 12px;
+
+    color:
+        var(--texto);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:
+        clamp(42px, 6vw, 68px);
+
+    font-weight: 500;
+
+    line-height: 1.04;
+
+    letter-spacing: -1.5px;
+}
+
+
+.welcome p {
+
+    max-width: 650px;
+
+    margin-bottom: 28px;
+
+    color:
+        var(--texto-suave);
+
+    font-size: 18px;
+}
+
+
+/* Botão adicionar */
+
+.add-button {
+
+    padding:
+        13px 23px;
+
+    border: none;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background:
+        var(--verde-escuro);
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 5px 15px rgba(64, 86, 68, 0.15);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+.add-button:hover {
+
+    background:
+        #435a47;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(64, 86, 68, 0.20);
+}
+
+
+
+
+
+/* =========================================================
+   6. SEÇÕES
+   ========================================================= */
+
+.statistics,
+.continuing,
+.latest-notes {
+
+    width: 88%;
+
+    max-width: 1250px;
+
+    margin:
+        0 auto 85px;
+}
+
+
+.section-title {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 25px;
+}
+
+
+.section-title h2 {
+
+    color:
+        var(--texto);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 32px;
+
+    font-weight: 500;
+}
+
+
+.section-title p {
+
+    margin-top: 4px;
+
+    color:
+        var(--texto-suave);
+
+    font-size: 15px;
+}
+
+
+.section-title a {
+
+    color:
+        var(--verde-escuro);
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.section-title a:hover {
+
+    text-decoration: underline;
+}
+
+#month-select {
+    padding: 11px 18px;
+    border: 1px solid var(--borda);
+    border-radius: 13px;
+    background: var(--fundo-claro);
+    color: var(--texto);
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
