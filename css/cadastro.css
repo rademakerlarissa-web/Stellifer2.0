@@ -1,0 +1,337 @@
+/* ================================
+   RESET
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ================================
+   PÁGINA
+================================ */
+
+body {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 30px;
+
+     background:
+        linear-gradient(rgba(20, 29, 55, 0.35), rgba(20, 29, 55, 0.35));
+     
+
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    color: #4d4652;
+}
+
+
+/* ================================
+   CONTAINER PRINCIPAL
+================================ */
+
+.cadastro-container {
+    width: 100%;
+    max-width: 1000px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border-radius: 30px;
+
+    box-shadow:
+        0 15px 40px rgba(70, 55, 80, 0.15);
+}
+
+
+/* ================================
+   ÁREA DE APRESENTAÇÃO
+================================ */
+
+.cadastro-intro {
+    min-height: 650px;
+
+    padding: 60px 50px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            rgba(28, 39, 68, 0.55),
+            rgba(41, 54, 90, 0.65)
+        ),
+        url("../imagens/ceu-estrelado.jpg");
+
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* ================================
+   LOGO
+================================ */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    margin-bottom: 35px;
+}
+
+.logo h1 {
+    font-family: Georgia, serif;
+
+    font-size: 3.2rem;
+    font-weight: 500;
+
+    color: #f6e9b5;
+
+    letter-spacing: 1px;
+}
+
+.logo-estrelas {
+    color: #f8e7a8;
+
+    font-size: 1.5rem;
+}
+
+
+/* ================================
+   TEXTO DA INTRODUÇÃO
+================================ */
+
+.cadastro-intro h2 {
+    font-family: Georgia, serif;
+
+    font-size: 1.6rem;
+    font-weight: 500;
+
+    color: #f4eaf7;
+
+    margin-bottom: 18px;
+}
+
+.cadastro-intro p {
+    max-width: 350px;
+
+    font-size: 1rem;
+    line-height: 1.7;
+
+    color: #d9d3e3;
+}
+
+
+/* ================================
+   CARD DE CADASTRO
+================================ */
+
+.cadastro-card {
+    padding: 55px 55px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    background: #ffffff;
+}
+
+.cadastro-card h2 {
+    font-family: Georgia, serif;
+
+    font-size: 2rem;
+    font-weight: 500;
+
+    color: #594b60;
+
+    margin-bottom: 8px;
+}
+
+.cadastro-subtitle {
+    margin-bottom: 30px;
+
+    font-size: 0.95rem;
+
+    color: #8a828e;
+
+    line-height: 1.5;
+}
+
+
+/* ================================
+   FORMULÁRIO
+================================ */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    color: #625967;
+}
+
+.form-group input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #ddd4df;
+    border-radius: 12px;
+
+    background: #faf8fb;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 0.95rem;
+
+    color: #4d4652;
+
+    outline: none;
+
+    transition: all 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: #aaa2ad;
+}
+
+.form-group input:focus {
+    border-color: #9b82a5;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(155, 130, 165, 0.12);
+}
+
+
+/* ================================
+   BOTÃO
+================================ */
+
+.cadastro-card .btn-cadastro {
+    width: 100%;
+
+    margin-top: 8px;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 13px;
+
+    background: #8f779b !important;
+
+    color: #ffffff !important;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+    box-shadow:
+        0 5px 12px rgba(100, 80, 110, 0.18);
+}
+
+.cadastro-card .btn-cadastro:hover {
+    background: #796183 !important;
+
+    color: #ffffff !important;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 15px rgba(100, 80, 110, 0.22);
+}
+
+
+/* ================================
+   LINK PARA LOGIN
+================================ */
+
+.login-text {
+    margin-top: 24px;
+
+    text-align: center;
+
+    font-size: 0.95rem;
+
+    color: #77717d;
+}
+
+.login-text a {
+    color: #7d6488;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.login-text a:hover {
+    color: #5f4869;
+
+    text-decoration: underline;
+}
+
+
+/* ================================
+   RESPONSIVIDADE
+================================ */
+
+@media (max-width: 750px) {
+
+    body {
+        padding: 15px;
+    }
+
+    .cadastro-container {
+        grid-template-columns: 1fr;
+    }
+
+    .cadastro-intro {
+        min-height: 300px;
+
+        padding: 40px 30px;
+    }
+
+    .cadastro-intro .logo {
+        margin-bottom: 20px;
+    }
+
+    .logo h1 {
+        font-size: 2.5rem;
+    }
+
+    .cadastro-intro h2 {
+        font-size: 1.4rem;
+    }
+
+    .cadastro-card {
+        padding: 40px 30px;
+    }
+}

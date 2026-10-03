@@ -13,8 +13,8 @@ body {
     min-height: 100vh;
 
     background:
-        linear-gradient(rgba(20, 29, 55, 0.35), rgba(20, 29, 55, 0.35)),
-        url("../imagens/ceu-estrelado.jpg");
+        linear-gradient(rgba(20, 29, 55, 0.35), rgba(20, 29, 55, 0.35));
+        
 
     background-size: cover;
     background-position: center;
@@ -69,11 +69,13 @@ body {
 
     text-align: center;
 
-    background: linear-gradient(
-        145deg,
-        rgba(28, 39, 68, 0.88),
-        rgba(41, 54, 90, 0.86)
-    );
+    
+    background:
+        linear-gradient(
+            rgba(28, 39, 68, 0.55),
+            rgba(41, 54, 90, 0.65)
+        ),
+        url("../imagens/ceu-estrelado.jpg");
 }
 
 /* ==============================
