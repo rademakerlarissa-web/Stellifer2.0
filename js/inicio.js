@@ -162,6 +162,7 @@
         if (typeof window.atualizarCarrosselInicio !== "function") { return; }
 
         const imagens = [];
+        const citacoesInicio = [];
         const usadas = new Set();
         const itensPorId = new Map(itens.map(function (item) {
             return [String(item.id), item];
@@ -191,6 +192,9 @@
         itens.forEach(function (item) {
             const titulo = item.obra && item.obra.titulo ? item.obra.titulo : "obra do diário";
             const citacoes = extrairCitacoes(item.citacoes);
+            citacoes.forEach(function (citacao) {
+                citacoesInicio.push({ citacao: citacao, obra: titulo });
+            });
             let indiceImagem = 0;
             if (item.obra) {
                 adicionarImagem(item.obra.capa, "Capa de " + titulo, citacoes, titulo, indiceImagem);
@@ -211,7 +215,7 @@
             });
         });
 
-        window.atualizarCarrosselInicio(imagens);
+        window.atualizarCarrosselInicio(imagens, citacoesInicio);
     }
 
     estadoVazio(listaObras, "Carregando seu diário...", "", "obra-vazia");

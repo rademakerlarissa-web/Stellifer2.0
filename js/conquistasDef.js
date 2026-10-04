@@ -77,7 +77,68 @@
           regra: function (s) { return s.xp >= 100; } },
 
         { nome: "Constelação", descricao: "Alcance 300 de XP", xp: 60, icone: "✨",
-          regra: function (s) { return s.xp >= 300; } }
+          regra: function (s) { return s.xp >= 300; } },
+
+        // ---------- Novos marcos ----------
+        { nome: "Estante acolhedora", descricao: "Registre 5 obras", xp: 25, icone: "🪴",
+          regra: function (s) { return s.obras >= 5; } },
+
+        { nome: "Grande coleção", descricao: "Registre 50 obras", xp: 120, icone: "🗄️",
+          regra: function (s) { return s.obras >= 50; } },
+
+        { nome: "Acervo lendário", descricao: "Registre 100 obras", xp: 200, icone: "🏛️",
+          regra: function (s) { return s.obras >= 100; } },
+
+        { nome: "Primeiro ciclo", descricao: "Conclua 5 obras", xp: 35, icone: "🎬",
+          regra: function (s) { return s.concluidas >= 5; } },
+
+        { nome: "Finalista de histórias", descricao: "Conclua 25 obras", xp: 100, icone: "🎉",
+          regra: function (s) { return s.concluidas >= 25; } },
+
+        { nome: "Mestre dos finais", descricao: "Conclua 50 obras", xp: 180, icone: "🏅",
+          regra: function (s) { return s.concluidas >= 50; } },
+
+        { nome: "Avaliações de ouro", descricao: "Avalie 25 obras", xp: 70, icone: "🥇",
+          regra: function (s) { return s.avaliadas >= 25; } },
+
+        { nome: "Crítico experiente", descricao: "Avalie 50 obras", xp: 120, icone: "🧐",
+          regra: function (s) { return s.avaliadas >= 50; } },
+
+        { nome: "Olhar lendário", descricao: "Avalie 100 obras", xp: 200, icone: "🔭",
+          regra: function (s) { return s.avaliadas >= 100; } },
+
+        { nome: "Páginas preenchidas", descricao: "Faça 25 anotações", xp: 70, icone: "📓",
+          regra: function (s) { return s.anotacoes >= 25; } },
+
+        { nome: "Caderno cheio", descricao: "Faça 100 anotações", xp: 150, icone: "📔",
+          regra: function (s) { return s.anotacoes >= 100; } },
+
+        { nome: "Cronista estelar", descricao: "Faça 250 anotações", xp: 250, icone: "🪶",
+          regra: function (s) { return s.anotacoes >= 250; } },
+
+        { nome: "Primeiro favorito", descricao: "Marque uma obra como favorita", xp: 15, icone: "💝",
+          regra: function (s) { return s.favoritos >= 1; } },
+
+        { nome: "Constelação de favoritos", descricao: "Marque 10 obras como favoritas", xp: 60, icone: "💫",
+          regra: function (s) { return s.favoritos >= 10; } },
+
+        { nome: "Amor em coleção", descricao: "Marque 25 obras como favoritas", xp: 120, icone: "💌",
+          regra: function (s) { return s.favoritos >= 25; } },
+
+        { nome: "Duas formas de sonhar", descricao: "Registre histórias de 2 tipos diferentes", xp: 20, icone: "🎭",
+          regra: function (s) { return s.tipos >= 2; } },
+
+        { nome: "Viajante de histórias", descricao: "Registre histórias de 4 tipos diferentes", xp: 60, icone: "🧳",
+          regra: function (s) { return s.tipos >= 4; } },
+
+        { nome: "Quase todo o universo", descricao: "Registre histórias de 5 tipos diferentes", xp: 80, icone: "🪐",
+          regra: function (s) { return s.tipos >= 5; } },
+
+        { nome: "Quinzena de histórias", descricao: "Registre algo por 14 dias seguidos", xp: 100, icone: "📅",
+          regra: function (s) { return s.sequencia >= 14; } },
+
+        { nome: "Mês inteiro de memórias", descricao: "Registre algo por 30 dias seguidos", xp: 250, icone: "🌙",
+          regra: function (s) { return s.sequencia >= 30; } }
     ];
 
 

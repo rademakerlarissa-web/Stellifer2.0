@@ -211,14 +211,36 @@
     }
 
     .carousel-citacao {
-        left: 16px;
-        right: 16px;
-        bottom: 38px;
-        padding: 12px 14px;
+        display: none;
     }
 
     .carousel-citacao cite {
         font-size: 12px;
+    }
+
+    .citacoes-mobile.has-citations {
+        display: block;
+        width: 100%;
+        margin: 20px 0 30px;
+    }
+
+    .citacoes-mobile-header h2 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .citacoes-mobile-header p {
+        text-align: center;
+    }
+
+    .citacoes-mobile-card {
+        min-height: 135px;
+        padding: 18px 42px 34px;
+        border-radius: 16px;
+    }
+
+    .citacao-mobile-slide blockquote {
+        font-size: 15px;
     }
 
     .carousel-caption h2 {
@@ -462,14 +484,8 @@
         gap: 8px 12px;
     }
 
-    .carousel-citacao blockquote {
-        font-size: clamp(15px, 4.3vw, 19px);
-        line-height: 1.3;
-    }
-
-    .carousel-citacao-longa blockquote,
-    .carousel-citacao-muito-longa blockquote {
-        font-size: clamp(13px, 3.8vw, 16px);
+    .citacoes-mobile.has-citations {
+        margin: 16px 0 24px;
     }
 }
 

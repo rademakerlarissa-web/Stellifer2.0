@@ -11,6 +11,11 @@
     const indicatorsContainer = document.querySelector(".carousel-indicators");
     const previousButton = document.querySelector(".carousel-button.prev");
     const nextButton = document.querySelector(".carousel-button.next");
+    const citationsSection = document.querySelector(".citacoes-mobile");
+    const citationsSlidesContainer = document.querySelector(".citacoes-mobile-slides");
+    const citationsIndicatorsContainer = document.querySelector(".citacoes-mobile-indicators");
+    const citationsPreviousButton = document.querySelector(".citacoes-mobile-button.prev");
+    const citationsNextButton = document.querySelector(".citacoes-mobile-button.next");
     const carouselTime = 10000;
     const fundosPasteis = [
         { titulo: "Minhas histórias, minhas memórias.", texto: "Um lugar para guardar aquilo que vivi através das histórias." },
@@ -19,6 +24,8 @@
     ];
     let currentSlide = 0;
     let carouselInterval = null;
+    let currentCitation = 0;
+    let citationsInterval = null;
 
     if (!container || !slidesContainer || !indicatorsContainer) { return; }
 
@@ -50,6 +57,84 @@
                 mostrarSlide(currentSlide + 1);
             }, carouselTime);
         }
+    }
+
+    function mostrarCitacao(index) {
+        const lista = Array.from(citationsSlidesContainer.querySelectorAll(".citacao-mobile-slide"));
+        if (lista.length === 0) { return; }
+
+        currentCitation = (index + lista.length) % lista.length;
+        lista.forEach(function (slide, i) {
+            const ativo = i === currentCitation;
+            slide.classList.toggle("active", ativo);
+            slide.setAttribute("aria-hidden", String(!ativo));
+        });
+
+        citationsIndicatorsContainer.querySelectorAll(".citacoes-mobile-indicator").forEach(function (indicator, i) {
+            indicator.classList.toggle("active", i === currentCitation);
+            indicator.setAttribute("aria-pressed", String(i === currentCitation));
+        });
+    }
+
+    function reiniciarTemporizadorCitacoes() {
+        window.clearInterval(citationsInterval);
+        const total = citationsSlidesContainer.querySelectorAll(".citacao-mobile-slide").length;
+        if (total > 1) {
+            citationsInterval = window.setInterval(function () {
+                mostrarCitacao(currentCitation + 1);
+            }, carouselTime);
+        }
+    }
+
+    function renderizarCitacoes(citacoes) {
+        if (!citationsSection || !citationsSlidesContainer || !citationsIndicatorsContainer) { return; }
+
+        const lista = Array.isArray(citacoes)
+            ? citacoes.filter(function (item) {
+                return item && typeof item.citacao === "string" && item.citacao.trim();
+            })
+            : [];
+
+        citationsSlidesContainer.replaceChildren();
+        citationsIndicatorsContainer.replaceChildren();
+        citationsSection.classList.toggle("has-citations", lista.length > 0);
+        if (lista.length === 0) {
+            window.clearInterval(citationsInterval);
+            return;
+        }
+
+        lista.forEach(function (item, index) {
+            const slide = document.createElement("article");
+            slide.className = "citacao-mobile-slide";
+            slide.setAttribute("aria-hidden", "true");
+
+            const citacao = document.createElement("blockquote");
+            citacao.textContent = "“" + item.citacao.trim() + "”";
+
+            const obra = document.createElement("cite");
+            obra.textContent = item.obra || "Obra do diário";
+
+            slide.append(citacao, obra);
+            citationsSlidesContainer.appendChild(slide);
+
+            const indicator = document.createElement("button");
+            indicator.type = "button";
+            indicator.className = "citacoes-mobile-indicator";
+            indicator.setAttribute("aria-label", "Mostrar citação " + (index + 1));
+            indicator.addEventListener("click", function () {
+                mostrarCitacao(index);
+                reiniciarTemporizadorCitacoes();
+            });
+            citationsIndicatorsContainer.appendChild(indicator);
+        });
+
+        const temVariasCitacoes = lista.length > 1;
+        citationsPreviousButton.hidden = !temVariasCitacoes;
+        citationsNextButton.hidden = !temVariasCitacoes;
+        citationsIndicatorsContainer.hidden = !temVariasCitacoes;
+        currentCitation = 0;
+        mostrarCitacao(currentCitation);
+        reiniciarTemporizadorCitacoes();
     }
 
     function montarSlide(dados, index, pastel) {
@@ -93,7 +178,7 @@
         return slide;
     }
 
-    function renderizar(imagens) {
+    function renderizar(imagens, citacoes) {
         const lista = Array.isArray(imagens) && imagens.length > 0
             ? imagens
             : fundosPasteis;
@@ -122,6 +207,7 @@
         currentSlide = 0;
         mostrarSlide(currentSlide);
         reiniciarTemporizador();
+        renderizarCitacoes(citacoes);
     }
 
     previousButton.addEventListener("click", function () {
@@ -132,6 +218,16 @@
     nextButton.addEventListener("click", function () {
         mostrarSlide(currentSlide + 1);
         reiniciarTemporizador();
+    });
+
+    citationsPreviousButton.addEventListener("click", function () {
+        mostrarCitacao(currentCitation - 1);
+        reiniciarTemporizadorCitacoes();
+    });
+
+    citationsNextButton.addEventListener("click", function () {
+        mostrarCitacao(currentCitation + 1);
+        reiniciarTemporizadorCitacoes();
     });
 
     window.atualizarCarrosselInicio = renderizar;

@@ -350,3 +350,137 @@
 
     background: white;
 }
+
+
+/* Citações separadas no layout mobile */
+
+.citacoes-mobile {
+    display: none;
+}
+
+.citacoes-mobile.has-citations {
+    display: none;
+}
+
+.citacoes-mobile-header {
+    margin-bottom: 12px;
+}
+
+.citacoes-mobile-header h2 {
+    color: var(--verde-escuro);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.citacoes-mobile-header p {
+    margin-top: 3px;
+    color: var(--texto-suave);
+    font-size: 13px;
+}
+
+.citacoes-mobile-card {
+    min-height: 150px;
+    position: relative;
+    padding: 22px 48px 38px;
+    overflow: hidden;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-medio);
+    background: var(--superficie, var(--fundo-claro));
+    box-shadow: var(--sombra);
+}
+
+.citacoes-mobile-slides {
+    display: grid;
+}
+
+.citacao-mobile-slide {
+    grid-area: 1 / 1;
+    align-self: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+}
+
+.citacao-mobile-slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.citacao-mobile-slide blockquote {
+    margin: 0;
+    color: var(--texto);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 16px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+.citacao-mobile-slide cite {
+    display: block;
+    margin-top: 10px;
+    color: var(--verde-escuro);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+}
+
+.citacoes-mobile-button {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: flex;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+    border: 1px solid var(--borda);
+    border-radius: 50%;
+    background: var(--fundo-claro);
+    color: var(--verde-escuro);
+    font-size: 12px;
+}
+
+.citacoes-mobile-button[hidden],
+.citacoes-mobile-indicators[hidden] {
+    display: none;
+}
+
+.citacoes-mobile-button.prev {
+    left: 10px;
+}
+
+.citacoes-mobile-button.next {
+    right: 10px;
+}
+
+.citacoes-mobile-indicators {
+    position: absolute;
+    right: 0;
+    bottom: 14px;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.citacoes-mobile-indicator {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--verde);
+    opacity: 0.45;
+}
+
+.citacoes-mobile-indicator.active {
+    width: 18px;
+    border-radius: 8px;
+    opacity: 1;
+}

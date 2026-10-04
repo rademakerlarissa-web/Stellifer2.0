@@ -4,15 +4,14 @@
 //
 // Um garotinho que mora no site: passeia, escala os cards,
 // cochila, dança, brinca de ioiô e reage quando você troca
-// de página. Se você trocar de página demais, ele fica
-// zangado!
+// de página.
 //
 // COMO ESTE ARQUIVO ESTÁ ORGANIZADO
 //   1. Opções e textos       (cores, estilos, falas)
 //   2. Desenho (SVG)         (o corpo do garotinho)
 //   3. Pose e expressões     (como ele se mexe)
 //   4. Comportamento         (o que ele decide fazer)
-//   5. Percepção de páginas  (curiosidade e birra)
+//   5. Percepção de páginas  (curiosidade e leitura)
 //   6. Interação             (clicar, arrastar)
 //   7. Painel de personalização
 //   8. Início
@@ -36,7 +35,7 @@
         visto: "stellifer-mascote-visto"
     };
 
-    // Quantas trocas de página, em quanto tempo, deixam ele zangado
+    // Quantas trocas rápidas acionam o passeio de leitura
     const LIMITE_TROCAS = 4;
     const JANELA_MS = 40000;
 
@@ -162,13 +161,6 @@
             "Tem coisa nova aqui?",
             "Hm… o que será que tem ali?"
         ],
-        bravo: [
-            "Para de trocar de página!",
-            "Tô ficando tonto!! 💢",
-            "Chega! Eu cansei!"
-        ],
-        emburrado: ["hmpf...", "Não tô falando com você.", "...", "Me deixa."],
-        passou: ["Tá bom, tá bom… já passou.", "Hmpf. Tô melhor.", "Pronto, passou! 😌"],
         acordar: ["Ahn? Eu dormi? 😴", "*bocejo*", "Hã? Quê?"],
         ioio: ["Olha esse truque!", "Sobe e desce, sobe e desce!"],
         danca: ["♪ la la la ♪", "Olha meu passinho!"],
@@ -446,11 +438,6 @@
       <text y="5.4" text-anchor="middle" fill="#b07a1c">!</text>
     </g></g>
 
-    <g class="m-fx-raiva" style="display:none">
-      <path d="M-7 -3 Q-3 -3 -3 -7 M7 -3 Q3 -3 3 -7 M-7 3 Q-3 3 -3 7 M7 3 Q3 3 3 7"
-            fill="none" stroke="#d9443f" stroke-width="2.6" stroke-linecap="round"/>
-    </g>
-
     <g class="m-fx-notas" style="display:none">
       <text x="-16" y="0">♪</text>
       <text x="8" y="-9">♫</text>
@@ -521,7 +508,6 @@
                     zzz: q(".m-fx-zzz"),
                     int: q(".m-fx-int"),
                     exc: q(".m-fx-exc"),
-                    raiva: q(".m-fx-raiva"),
                     notas: q(".m-fx-notas"),
                     coracao: q(".m-fx-coracao"),
                     ret: q(".m-fx-ret")
@@ -584,14 +570,6 @@
             d: "M4 -8 Q7.5 -9.6 11 -7.6",
             b: "M-5.2 10.2 Q0 19.5 5.2 10.2 Z",
             cheia: true, rubor: 0.55, vermelho: false
-        },
-
-        bravo: {
-            o: "a",
-            e: "M-11.5 -9.4 L-3.5 -5.4",
-            d: "M3.5 -5.4 L11.5 -9.4",
-            b: "M-4.4 14.4 Q0 10 4.4 14.4",
-            cheia: false, rubor: 0.75, vermelho: true
         },
 
         curious: {
@@ -730,7 +708,7 @@
             P.ioio.style.display = "none";
         }
 
-        // Símbolos (zzz, ?, !, raiva, notas, coração)
+        // Símbolos (zzz, ?, !, notas, coração)
         const chave = p.fx.join(",");
 
         if (inst.fxChave !== chave) {
@@ -788,7 +766,6 @@
         solo: true,                         // está no chão?
         lieDir: 1,
         fase: 0, xAnt: 0,
-        humor: "calmo", bravoAte: 0,
         ultima: null,
         piscaEm: 2, piscaT: -1
     };
@@ -1119,7 +1096,7 @@
         }
 
         // 1) anda até a lateral do card
-        await andarAte(meu, baseX(), (pressa ? 130 : 62) * S * A.vel, pressa ? "bravo-andar" : "andar");
+        await andarAte(meu, baseX(), (pressa ? 130 : 62) * S * A.vel, pressa ? "correr" : "andar");
 
         // 2) sobe pela lateral
         M.solo = false;
@@ -1222,6 +1199,37 @@
         await esperar(meu, rnd(12, 20));
     }
 
+    async function aPassearLendo(meu) {
+
+        if (M.sup) {
+            await aDescer(meu);
+        }
+
+        say(pick(FALAS.ler), 3200);
+
+        if (REDUZIR) {
+            M.modo = "ler";
+            await esperar(meu, 5);
+            return;
+        }
+
+        const fim = performance.now() + rnd(6500, 9000);
+
+        while (performance.now() < fim) {
+            const lim = limites();
+            const alvo = rnd(lim.a, lim.b);
+
+            if (Math.abs(alvo - M.x) < 60) {
+                await esperar(meu, 0.3);
+                continue;
+            }
+
+            await andarAte(meu, alvo, 48 * S * A.vel, "andar-ler");
+        }
+
+        M.modo = "parado";
+    }
+
     async function aDancar(meu) {
 
         const tipo = pick(["sway", "hop", "spin", "disco"]);
@@ -1249,7 +1257,7 @@
     // Clique no mascote
     async function aReagir(meu) {
 
-        if (M.modo === "dormir" || M.modo === "emburrar") {
+        if (M.modo === "dormir") {
 
             M.modo = "susto";
 
@@ -1309,15 +1317,9 @@
         M.y = chaoY();
         M.dir = daEsquerda ? 1 : -1;
 
-        // volta a posição para o chão e já começa a correr
-        if (tipo === "bravo") {
-
-            M.humor = "bravo";
-            M.bravoAte = Date.now() + 6000;
-
-            await andarAte(meu, vw * rnd(0.3, 0.7), 120 * S, "bravo-andar");
-
-            return aBravo(meu);
+        // A leitura começa assim que ele chega ao chão.
+        if (tipo === "ler-andando") {
+            return aPassearLendo(meu);
         }
 
         if (tipo === "viagem") {
@@ -1376,101 +1378,11 @@
         return aCuriosoParado(meu);
     }
 
-    // Trocou de página demais: fica zangado
-    async function aBravo(meu) {
-
-        M.humor = "bravo";
-
-        M.bravoAte = Math.max(M.bravoAte, Date.now() + 8000);
-
-        if (M.sup) {
-            await aCair(meu, 0, -60);
-        }
-
-        M.modo = "bravo";
-
-        say(pick(FALAS.bravo), 2800);
-
-        await esperar(meu, 3.4);
-
-        if (Math.random() < 0.45) {
-
-            // brinca de ioiô, ainda bravo
-            M.modo = "ioio-bravo";
-
-            const fim = Date.now() + rnd(8000, 12000);
-
-            M.bravoAte = Math.max(M.bravoAte, fim);
-
-            while (Date.now() < M.bravoAte) {
-                await proximoFrame(meu);
-            }
-
-        } else {
-
-            await aEmburrar(meu);
-        }
-
-        M.humor = "calmo";
-
-        say(pick(FALAS.passou));
-    }
-
-    // Vai deitar em algum lugar, emburrado
-    async function aEmburrar(meu) {
-
-        M.humor = "bravo";
-
-        const atual = Date.now();
-
-        if (M.bravoAte < atual) {
-            M.bravoAte = atual + 9000;
-        }
-
-        if (!REDUZIR && !M.sup && plataformasAlcancaveis().length && Math.random() < 0.55) {
-
-            await aEscalar(meu, true);
-
-        } else if (!M.sup) {
-
-            const alvo = clamp(M.x + (Math.random() < 0.5 ? -1 : 1) * rnd(180, 420), 40, window.innerWidth - 40);
-
-            await andarAte(meu, alvo, 120 * S, "bravo-andar");
-        }
-
-        M.lieDir = Math.random() < 0.5 ? -1 : 1;
-
-        M.modo = "emburrar";
-
-        say(pick(FALAS.emburrado));
-
-        const fim = Date.now() + rnd(14000, 20000);
-
-        M.bravoAte = Math.max(M.bravoAte, fim);
-
-        while (Date.now() < M.bravoAte) {
-            await proximoFrame(meu);
-        }
-
-        M.modo = "acordar";
-
-        await esperar(meu, 0.8);
-    }
-
     // Escolhe, com sorteio, o que fazer em seguida
     function escolherAcao() {
 
         if (REDUZIR) {
             return aParado;
-        }
-
-        if (M.humor === "bravo") {
-
-            if (Date.now() < M.bravoAte) {
-                return aEmburrar;
-            }
-
-            M.humor = "calmo";
         }
 
         const em = !!M.sup;
@@ -1617,9 +1529,9 @@
         }
 
         // ----- andando / correndo -----
-        if (m === "andar" || m === "correr" || m === "bravo-andar") {
+        if (m === "andar" || m === "correr" || m === "andar-ler") {
 
-            const corre = m !== "andar";
+            const corre = m === "correr";
 
             const fase = M.fase;
 
@@ -1638,12 +1550,15 @@
 
             T.lean = M.dir * (corre ? 9 : 3.5);
 
-            T.aL = 14 + fR * 12;
-            T.aR = 14 + fL * 12;
+            T.aL = m === "andar-ler" ? -35 : 14 + fR * 12;
+            T.aR = m === "andar-ler" ? -35 : 14 + fL * 12;
 
             T.look = M.dir * 0.9;
+            T.lookY = m === "andar-ler" ? 1 : 0;
+            T.tilt = m === "andar-ler" ? 5 : 0;
+            T.livro = m === "andar-ler";
 
-            T.expr = m === "bravo-andar" ? "bravo" : (corre ? "happy" : "smile");
+            T.expr = corre ? "happy" : "smile";
 
             return;
         }
@@ -1730,7 +1645,7 @@
             return;
         }
 
-        // ----- dormindo / emburrado -----
+        // ----- dormindo -----
         if (m === "dormir") {
 
             T.lie = 1;
@@ -1748,27 +1663,6 @@
             T.expr = "sleep";
 
             T.fx = ["zzz"];
-
-            return;
-        }
-
-        if (m === "emburrar") {
-
-            T.lie = 1;
-
-            T.aL = 12;
-            T.aR = 12;
-
-            T.lL = 6;
-            T.lR = 6;
-
-            T.sq = 1 + Math.sin(tg * 1.2) * 0.015;
-
-            T.bob = 0;
-
-            T.expr = "bravo";
-
-            T.fx = Math.floor(t / 3) % 2 === 0 ? ["ret"] : [];
 
             return;
         }
@@ -1848,34 +1742,10 @@
             return;
         }
 
-        // ----- zangado -----
-        if (m === "bravo") {
-
-            const ph = t * 15;
-
-            T.liftL = Math.max(0, Math.sin(ph)) * 7;
-            T.liftR = Math.max(0, -Math.sin(ph)) * 7;
-
-            T.bob = -Math.abs(Math.sin(ph)) * 2;
-
-            T.aL = 18 + Math.sin(ph * 2) * 6;
-            T.aR = 18 + Math.cos(ph * 2) * 6;
-
-            T.jx = Math.sin(t * 40) * 1.2;
-
-            T.expr = "bravo";
-
-            T.fx = ["raiva"];
-
-            return;
-        }
-
         // ----- ioiô -----
-        if (m === "ioio" || m === "ioio-bravo") {
+        if (m === "ioio") {
 
-            const brava = m === "ioio-bravo";
-
-            const u = t * (brava ? 10 : 5.2);
+            const u = t * 5.2;
 
             const ext = 0.5 - 0.5 * Math.cos(u);
 
@@ -1891,9 +1761,7 @@
 
             T.bob = Math.sin(u * 2) * 0.8;
 
-            T.expr = brava ? "bravo" : "happy";
-
-            T.fx = brava && Math.floor(t * 2) % 3 === 0 ? ["raiva"] : [];
+            T.expr = "happy";
 
             return;
         }
@@ -2203,8 +2071,6 @@
         // estado inicial
         M.sup = null;
         M.solo = true;
-        M.humor = "calmo";
-        M.bravoAte = 0;
         M.modo = "parado";
         M.modoAnt = "";
         M.x = -80;
@@ -2267,8 +2133,8 @@
     // 5. PERCEPÇÃO DE PÁGINAS
     // =================================================
 
-    // Anota uma troca de página. Devolve true se já foram
-    // trocas demais (hora de ficar zangado).
+    // Anota uma troca de página. Devolve true após várias
+    // trocas rápidas para iniciar o passeio de leitura.
     function registrarTroca() {
 
         const agora = Date.now();
@@ -2313,21 +2179,10 @@
             return;
         }
 
-        const bravo = registrarTroca();
+        const muitasTrocas = registrarTroca();
 
-        if (M.humor === "bravo") {
-
-            M.bravoAte = Math.max(M.bravoAte, Date.now() + 7000);
-
-            say(pick(FALAS.emburrado));
-
-            return;
-        }
-
-        if (bravo) {
-
-            interromper(aBravo);
-
+        if (muitasTrocas) {
+            interromper(aPassearLendo);
             return;
         }
 
@@ -2377,11 +2232,11 @@
 
         if (saida && typeof saida.t === "number" && Date.now() - saida.t < SAIDA_MS) {
 
-            const bravo = registrarTroca();
+            const muitasTrocas = registrarTroca();
 
             const cx = (typeof saida.mx === "number" ? saida.mx : 0.5) * window.innerWidth;
 
-            return { tipo: bravo ? "bravo" : "viagem", cx: cx };
+            return { tipo: muitasTrocas ? "ler-andando" : "viagem", cx: cx };
         }
 
         return { tipo: visto ? "volta" : "novo", cx: null };
@@ -2399,14 +2254,6 @@
         const duplo = agora - ultimoClique < 400;
 
         ultimoClique = agora;
-
-        // zangado: só resmunga
-        if (M.humor === "bravo") {
-
-            say(pick(FALAS.emburrado));
-
-            return;
-        }
 
         if (duplo) {
 
