@@ -4,6 +4,7 @@ node_modules/
 # Variáveis de ambiente
 .env
 .env.*
+senhas.txt
 
 # Arquivos do sistema
 .DS_Store
