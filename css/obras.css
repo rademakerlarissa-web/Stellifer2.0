@@ -38,6 +38,23 @@
         box-shadow 0.25s ease;
 }
 
+.work-card > a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.work-cover-placeholder {
+    width: 100%;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--fundo-verde);
+    color: var(--verde-escuro);
+    font-size: 48px;
+}
+
 
 .work-card:hover {
 
@@ -101,4 +118,3 @@
 
     font-size: 14px;
 }
-

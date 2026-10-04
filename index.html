@@ -51,9 +51,9 @@
         <!-- Nav é a barra de navegação do site, onde ficam os links para as diferentes seções ou páginas. -->
         <nav> 
             <a href="index.html">Início</a>
-            <a href="#">Meu Diário</a>
-            <a href="#">Conquistas</a>
-            <a href="#">Perfil</a>
+            <a href="diario.html">Meu Diário</a>
+            <a href="conquistas.html">Conquistas</a>
+            <a href="perfil.html">Perfil</a>
 
             <!-- Botão de tema claro / escuro -->
             <button class="tema-toggle" id="tema-toggle" type="button"
@@ -78,86 +78,21 @@
 
         <div class="carousel-container">
 
-            <!-- Imagem 1 -->
-            <div class="carousel-slide active">
-
-                <img
-                    src="imagens/carrossel1.jpg"
-                    alt="Uma das histórias registradas no Stellifer">
-
-                <div class="carousel-caption">
-
-                    <h2>Minhas histórias, minhas memórias.</h2>
-
-                    <p>
-                        Um lugar para guardar aquilo que vivi através das histórias.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- Imagem 2 -->
-            <div class="carousel-slide">
-
-                <img
-                    src="imagens/carrossel2.jpg"
-                    alt="Imagem de uma obra registrada">
-
-                <div class="carousel-caption">
-
-                    <h2>Cada história deixa uma marca.</h2>
-
-                    <p>
-                        Registre seus momentos favoritos.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- Imagem 3 -->
-            <div class="carousel-slide">
-
-                <img
-                    src="imagens/carrossel3.jpg"
-                    alt="Imagem relacionada ao diário">
-
-                <div class="carousel-caption">
-
-                    <h2>Reviva suas histórias.</h2>
-
-                    <p>
-                        Relembre o que você sentiu, pensou e viveu.
-                    </p>
-
-                </div>
-
-            </div>
+            <div class="carousel-slides" aria-live="polite"></div>
 
 
             <!-- Botões -->
-            <button class="carousel-button prev">
+            <button class="carousel-button prev" type="button" aria-label="Imagem anterior">
                 ❮
             </button>
 
-            <button class="carousel-button next">
+            <button class="carousel-button next" type="button" aria-label="Próxima imagem">
                 ❯
             </button>
 
 
             <!-- Indicadores -->
-            <div class="carousel-indicators">
-
-                <span class="indicator active"></span>
-
-                <span class="indicator"></span>
-
-                <span class="indicator"></span>
-
-            </div>
+            <div class="carousel-indicators" aria-label="Escolher imagem"></div>
 
         </div>
 
@@ -173,7 +108,7 @@
             Um lugar para guardar aquilo que vivi através das histórias.
         </p>
 
-        <button class="add-button">
+        <button class="add-button" type="button" onclick="window.location.href='diario.html?nova=1'">
             + Adicionar obra
         </button>
 
@@ -337,10 +272,10 @@
 
     <div class="stat-card weekly-card">
 
-        <h3>Frequência de anotações</h3>
+        <h3>Frequência de atividades</h3>
 
-        <p class="stat-description">
-            Anotações realizadas nesta semana
+        <p class="stat-description" id="weekly-activity-description">
+            Anotações e obras adicionadas nesta semana
         </p>
 
 
@@ -349,7 +284,9 @@
 
             <div class="week-day"
                  data-day="Segunda-feira"
-                 data-count="3">
+                 data-count="3"
+                 data-annotations="3"
+                 data-works="0">
 
                 <div class="bar" style="height: 45%;"></div>
 
@@ -360,7 +297,9 @@
 
             <div class="week-day"
                  data-day="Terça-feira"
-                 data-count="5">
+                 data-count="5"
+                 data-annotations="5"
+                 data-works="0">
 
                 <div class="bar" style="height: 70%;"></div>
 
@@ -371,7 +310,9 @@
 
             <div class="week-day"
                  data-day="Quarta-feira"
-                 data-count="2">
+                 data-count="2"
+                 data-annotations="2"
+                 data-works="0">
 
                 <div class="bar" style="height: 35%;"></div>
 
@@ -382,7 +323,9 @@
 
             <div class="week-day"
                  data-day="Quinta-feira"
-                 data-count="7">
+                 data-count="7"
+                 data-annotations="7"
+                 data-works="0">
 
                 <div class="bar" style="height: 90%;"></div>
 
@@ -393,7 +336,9 @@
 
             <div class="week-day"
                  data-day="Sexta-feira"
-                 data-count="4">
+                 data-count="4"
+                 data-annotations="4"
+                 data-works="0">
 
                 <div class="bar" style="height: 55%;"></div>
 
@@ -404,7 +349,9 @@
 
             <div class="week-day"
                  data-day="Sábado"
-                 data-count="6">
+                 data-count="6"
+                 data-annotations="6"
+                 data-works="0">
 
                 <div class="bar" style="height: 75%;"></div>
 
@@ -415,7 +362,9 @@
 
             <div class="week-day"
                  data-day="Domingo"
-                 data-count="1">
+                 data-count="1"
+                 data-annotations="1"
+                 data-works="0">
 
                 <div class="bar" style="height: 25%;"></div>
 
@@ -431,7 +380,7 @@
             <strong>Selecione um dia</strong>
 
             <span>
-                para ver a quantidade de anotações
+                para ver anotações e obras adicionadas
             </span>
 
         </div>
@@ -653,7 +602,7 @@
                     </p>
                 </div>
 
-                <a href="#">Ver todas</a>
+                <a href="diario.html">Ver todas</a>
 
             </div>
 
@@ -736,7 +685,7 @@
                     </p>
                 </div>
 
-                <a href="#">Ver todas</a>
+                <a href="anotacoes.html">Ver todas</a>
 
             </div>
 
@@ -812,75 +761,50 @@
         <aside class="lateral">
 
             <!-- PERFIL -->
-            <div class="perfil-card">
+            <div class="perfil-card bloqueado">
 
                 <div class="perfil-conteudo-bloqueado">
 
                     <div class="perfil-foto">
-                        <img src="imagens/perfil-placeholder.png" alt="Foto de perfil">
+                        <img id="perfil-foto" src="imagens/perfil-placeholder.png" alt="Foto de perfil">
                     </div>
 
-                    <h3>Larissa</h3>
+                    <h3 id="perfil-nome">Larissa</h3>
 
-                    <p>@larissa</p>
+                    <p id="perfil-usuario">@larissa</p>
 
-                    <span class="perfil-nivel">
+                    <span class="perfil-nivel" id="perfil-nivel">
                         ✦ Nível 1
                     </span>
 
                 </div>
 
                 <div class="login-overlay">
-                    <button>🔒 Faça login para visualizar</button>
+                    <button type="button" onclick="window.location.href='login.html'">🔒 Faça login para visualizar</button>
                 </div>
 
             </div>
 
             <!-- CONQUISTAS -->
-            <div class="conquistas-card">
+            <div class="conquistas-card bloqueado">
 
             <div class="conquistas-conteudo-bloqueado">
 
                 <div class="conquistas-titulo">
                     <h3>🏆 Conquistas</h3>
-                    <a href="#">Ver todas</a>
+                    <a href="conquistas.html">Ver todas</a>
                 </div>
 
-                <div class="conquistas-lista">
-
-                    <div class="conquista">
-                        <div class="conquista-icone">📖</div>
-
-                        <div class="conquista-info">
-                            <strong>Primeira história</strong>
-                            <span>Registre sua primeira obra</span>
-                        </div>
-                    </div>
-
-                <div class="conquista">
-                    <div class="conquista-icone">⭐</div>
-
-                    <div class="conquista-info">
-                        <strong>Crítico iniciante</strong>
-                        <span>Avalie sua primeira obra</span>
-                    </div>
-                </div>
-
-                <div class="conquista">
-                    <div class="conquista-icone">✍️</div>
-
-                    <div class="conquista-info">
-                        <strong>Memórias guardadas</strong>
-                        <span>Faça sua primeira anotação</span>
-                    </div>
-                </div>
-
-            </div>
+                <div class="conquistas-lista"></div>
 
         </div>
 
             <div class="conquistas-login-overlay">
-                <button>🔒 Faça login para visualizar</button>
+                <button
+                    type="button"
+                    onclick="window.location.href='login.html'">
+                    🔒 Faça login para visualizar
+                </button>
             </div>
 
 </div>
@@ -913,6 +837,9 @@
     <script src="js/estatisticas.js"></script>
     <script src="js/tema.js"></script>
     <script src="js/mascote.js"></script>
+    <script src="js/conquistasDef.js"></script>
+    <script src="js/inicio.js"></script>
+    <script src="js/usuario.js"></script>
 
 
 

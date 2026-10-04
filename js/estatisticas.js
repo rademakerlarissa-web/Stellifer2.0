@@ -101,16 +101,17 @@ weekDays.forEach(function(day) {
     day.addEventListener("click", function() {
 
         const dayName = day.dataset.day;
-        const count = Number(day.dataset.count);
+        const annotations = Number(day.dataset.annotations || 0);
+        const works = Number(day.dataset.works || 0);
+        const annotationText = annotations === 1 ? "anotação" : "anotações";
+        const workText = works === 1 ? "obra adicionada" : "obras adicionadas";
+        const heading = document.createElement("strong");
+        const detail = document.createElement("span");
 
-        const text = count === 1
-            ? "anotação"
-            : "anotações";
-
-        annotationInfo.innerHTML = `
-            <strong>${dayName}</strong>
-            <span>📝 ${count} ${text}</span>
-        `;
+        heading.textContent = dayName;
+        detail.textContent = "📝 " + annotations + " " + annotationText +
+            " · 📚 " + works + " " + workText;
+        annotationInfo.replaceChildren(heading, detail);
 
     });
 
@@ -216,25 +217,43 @@ function updateRatingChart(ratings) {
 
     // Descobre qual nota possui a maior porcentagem
 
-    let mostFrequentRating = 5;
+    let mostFrequentRating = 0;
 
-    for (let rating = 4; rating >= 1; rating--) {
+    for (let rating = 5; rating >= 1; rating--) {
 
-        if (ratings[rating] > ratings[mostFrequentRating]) {
+        if (ratings[rating] > (ratings[mostFrequentRating] || 0)) {
             mostFrequentRating = rating;
         }
 
     }
 
-
-    // Cria as estrelas
-
-    const stars =
-        "⭐".repeat(mostFrequentRating);
-
-
     document.querySelector("#most-frequent-stars")
-        .textContent = stars;
+        .textContent = mostFrequentRating ? "⭐".repeat(mostFrequentRating) : "—";
+
+    const circle = document.querySelector(".rating-circle");
+    if (circle) {
+        const cores = {
+            5: "var(--rosa-escuro)",
+            4: "var(--lilas-escuro)",
+            3: "var(--azul-escuro)",
+            2: "var(--amarelo)",
+            1: "var(--pessego)"
+        };
+        let ponto = 0;
+        const fatias = [];
+
+        [5, 4, 3, 2, 1].forEach(function (nota) {
+            const proximo = ponto + (Number(ratings[nota]) || 0);
+            if (proximo > ponto) {
+                fatias.push(cores[nota] + " " + ponto + "% " + proximo + "%");
+            }
+            ponto = proximo;
+        });
+
+        circle.style.background = fatias.length
+            ? "conic-gradient(" + fatias.join(", ") + ")"
+            : "conic-gradient(var(--borda) 0% 100%)";
+    }
 
 }
 
@@ -314,11 +333,10 @@ function updateStatusChart(status) {
     // Calcula as porcentagens
 
     const completedPercent =
-        (completed / total) * 100;
+        total ? (completed / total) * 100 : 0;
 
     const progressPercent =
-        completedPercent +
-        (progress / total) * 100;
+        total ? completedPercent + (progress / total) * 100 : 0;
 
 
     // Atualiza o gráfico
@@ -327,13 +345,13 @@ function updateStatusChart(status) {
         document.querySelector("#status-circle");
 
 
-    statusCircle.style.background = `
+    statusCircle.style.background = total ? `
         conic-gradient(
             var(--verde-escuro) 0% ${completedPercent}%,
             var(--azul-escuro) ${completedPercent}% ${progressPercent}%,
             var(--rosa-escuro) ${progressPercent}% 100%
         )
-    `;
+    ` : "conic-gradient(var(--borda) 0% 100%)";
 
 }
 
@@ -342,8 +360,12 @@ function updateStatusChart(status) {
 // =====================================================
 
 function updateHighlights(highlights) {
-
-    highlights.forEach(function(work, index) {
+    for (let index = 0; index < 3; index++) {
+        const work = highlights[index] || {
+            title: "Nenhuma obra",
+            type: "—",
+            rating: 0
+        };
 
         const number =
             index + 1;
@@ -362,9 +384,8 @@ function updateHighlights(highlights) {
         document.querySelector(
             `#highlight-${number}-rating`
         ).textContent =
-            "⭐".repeat(work.rating);
-
-    });
+            work.rating ? "⭐".repeat(work.rating) : "Sem avaliação";
+    }
 
 }
 
@@ -376,23 +397,11 @@ function updateStatistics() {
 
     let data;
 
-
-    // -------------------------------------------------
-    // HISTÓRICO GERAL
-    // -------------------------------------------------
-
-    if (generalButton.classList.contains("active")) {
-
+    if (usuarioComSessao()) {
+        data = estatisticasDaConta(itensDaConta || []);
+    } else if (generalButton.classList.contains("active")) {
         data = generalStatistics;
-
-    }
-
-
-    // -------------------------------------------------
-    // MÊS / ANO
-    // -------------------------------------------------
-
-    else {
+    } else {
 
         const month =
             String(monthSelect.value).padStart(2, "0");
@@ -407,8 +416,6 @@ function updateStatistics() {
 
         data = statisticsData[period];
 
-
-        // Caso ainda não exista dado para esse período
 
         if (!data) {
 
@@ -428,25 +435,7 @@ function updateStatistics() {
                     abandoned: 0
                 },
 
-                highlights: [
-                    {
-                        title: "Nenhuma obra",
-                        type: "—",
-                        rating: 0
-                    },
-
-                    {
-                        title: "Nenhuma obra",
-                        type: "—",
-                        rating: 0
-                    },
-
-                    {
-                        title: "Nenhuma obra",
-                        type: "—",
-                        rating: 0
-                    }
-                ]
+                highlights: []
 
             };
 
@@ -467,7 +456,124 @@ function updateStatistics() {
 
 }
 
+let itensDaConta = null;
 
+function usuarioComSessao() {
+    try {
+        const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+        return Boolean(usuario && usuario.id_usuario);
+    } catch (erro) {
+        return false;
+    }
+}
 
+function estatisticasDaConta(itens) {
+    let filtrados = itens;
+
+    if (!generalButton.classList.contains("active")) {
+        const periodo = String(yearSelect.value) + "-" +
+            String(monthSelect.value).padStart(2, "0");
+
+        filtrados = itens.filter(function (item) {
+            return [item.dataInicio, item.dataConclusao].some(function (data) {
+                return data && String(data).slice(0, 7) === periodo;
+            });
+        });
+    }
+
+    const contagemNotas = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const avaliados = filtrados.filter(function (item) {
+        const nota = Number(item.nota);
+        return Number.isInteger(nota) && nota >= 1 && nota <= 5;
+    });
+
+    avaliados.forEach(function (item) {
+        contagemNotas[Number(item.nota)] += 1;
+    });
+
+    const ratings = {};
+    [1, 2, 3, 4, 5].forEach(function (nota) {
+        ratings[nota] = avaliados.length
+            ? Math.round((contagemNotas[nota] / avaliados.length) * 100)
+            : 0;
+    });
+
+    const status = {
+        completed: filtrados.filter(function (item) { return item.status === "concluida"; }).length,
+        progress: filtrados.filter(function (item) { return item.status === "em_andamento"; }).length,
+        abandoned: filtrados.filter(function (item) { return item.status === "abandonada"; }).length
+    };
+
+    const highlights = avaliados
+        .slice()
+        .sort(function (a, b) {
+            return Number(b.nota) - Number(a.nota) ||
+                String(a.obra.titulo).localeCompare(String(b.obra.titulo));
+        })
+        .slice(0, 3)
+        .map(function (item) {
+            return {
+                title: item.obra.titulo,
+                type: item.obra.tipo || "—",
+                rating: Number(item.nota)
+            };
+        });
+
+    return { ratings: ratings, status: status, highlights: highlights };
+}
+
+function atualizarSemanaDaConta(anotacoes, itens) {
+    const hoje = new Date();
+    const inicioSemana = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    inicioSemana.setDate(inicioSemana.getDate() - ((inicioSemana.getDay() + 6) % 7));
+
+    const contagens = [0, 0, 0, 0, 0, 0, 0];
+    const anotacoesPorDia = [0, 0, 0, 0, 0, 0, 0];
+    const obrasPorDia = [0, 0, 0, 0, 0, 0, 0];
+    anotacoes.forEach(function (anotacao) {
+        if (!anotacao.data) { return; }
+        const partes = String(anotacao.data).slice(0, 10).split("-");
+        if (partes.length !== 3) { return; }
+        const data = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+        const diferenca = Math.floor((data - inicioSemana) / 86400000);
+        if (diferenca >= 0 && diferenca < 7) {
+            anotacoesPorDia[diferenca] += 1;
+            contagens[diferenca] += 1;
+        }
+    });
+    itens.forEach(function (item) {
+        if (!item.dataAdicionado) { return; }
+        const partes = String(item.dataAdicionado).slice(0, 10).split("-");
+        if (partes.length !== 3) { return; }
+        const data = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+        const diferenca = Math.floor((data - inicioSemana) / 86400000);
+        if (diferenca >= 0 && diferenca < 7) {
+            obrasPorDia[diferenca] += 1;
+            contagens[diferenca] += 1;
+        }
+    });
+
+    const maximo = Math.max.apply(null, contagens);
+    weekDays.forEach(function (dia, indice) {
+        const total = contagens[indice];
+        dia.dataset.count = String(total);
+        dia.dataset.annotations = String(anotacoesPorDia[indice]);
+        dia.dataset.works = String(obrasPorDia[indice]);
+        dia.querySelector(".bar").style.height = maximo
+            ? Math.max(8, Math.round((total / maximo) * 90)) + "%"
+            : "0%";
+    });
+}
+
+window.atualizarResumoInicio = function (itens, anotacoes) {
+    itensDaConta = itens;
+    updateStatistics();
+    atualizarSemanaDaConta(anotacoes, itens);
+};
+
+if (usuarioComSessao()) {
+    itensDaConta = [];
+    atualizarSemanaDaConta([], []);
+}
 updateStatisticsPeriod();
 updateStatistics();

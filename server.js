@@ -8,7 +8,8 @@ const PORT = 3000;
 
 
 // Permite que o servidor receba dados em JSON
-app.use(express.json());
+// (limite maior: fotos de perfil e capas podem ir como imagem em base64)
+app.use(express.json({ limit: "15mb" }));
 
 // Permite comunicação entre o front-end e o back-end
 app.use(cors());
@@ -234,6 +235,13 @@ app.post("/login", async (req, res) => {
     }
 
 });
+
+
+// ================================
+// PERFIL, DIÁRIO, ANOTAÇÕES E CONQUISTAS
+// ================================
+
+require("./rotas/stellifer")(app, conexao);
 
 
 // ================================

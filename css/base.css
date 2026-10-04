@@ -383,6 +383,24 @@ section {
     font-weight: 500;
 }
 
+.resumo-vazio {
+    grid-column: 1 / -1;
+    min-height: 90px;
+    padding: 22px;
+    border: 1px dashed var(--borda);
+    border-radius: var(--raio-medio);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    color: var(--texto-suave);
+    text-align: center;
+}
+
+.resumo-vazio strong {
+    color: var(--texto);
+}
+
 
 .section-title p {
 

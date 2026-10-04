@@ -1,0 +1,141 @@
+// =====================================================
+// DEFINIÇÃO DAS CONQUISTAS
+// =====================================================
+//
+// Este arquivo é usado pelo navegador (páginas) E pelo
+// Node (server.js), então as regras ficam em um lugar só.
+//
+// Cada conquista tem:
+//   nome, descricao, xp (recompensa), icone e uma função
+//   "regra" que recebe as estatísticas do usuário e diz
+//   se ela já pode ser desbloqueada.
+//
+// Estatísticas recebidas pela regra:
+//   obras, concluidas, avaliadas, anotacoes, tipos,
+//   favoritos, sequencia (maior sequência de dias seguidos
+//   com registros) e xp.
+
+(function (raiz) {
+
+    const CONQUISTAS = [
+
+        // ---------- Primeiros passos ----------
+        { nome: "Primeira história", descricao: "Registre sua primeira obra", xp: 20, icone: "📖",
+          regra: function (s) { return s.obras >= 1; } },
+
+        { nome: "Crítico iniciante", descricao: "Avalie sua primeira obra", xp: 15, icone: "⭐",
+          regra: function (s) { return s.avaliadas >= 1; } },
+
+        { nome: "Memórias guardadas", descricao: "Faça sua primeira anotação", xp: 15, icone: "✍️",
+          regra: function (s) { return s.anotacoes >= 1; } },
+
+        { nome: "Final feliz", descricao: "Conclua sua primeira obra", xp: 20, icone: "🏁",
+          regra: function (s) { return s.concluidas >= 1; } },
+
+        // ---------- Quantidade de obras ----------
+        { nome: "Colecionador", descricao: "Registre 10 obras", xp: 50, icone: "📚",
+          regra: function (s) { return s.obras >= 10; } },
+
+        { nome: "Biblioteca estelar", descricao: "Registre 25 obras", xp: 100, icone: "🌌",
+          regra: function (s) { return s.obras >= 25; } },
+
+        // ---------- Conclusões ----------
+        { nome: "Maratonista", descricao: "Conclua 10 obras", xp: 60, icone: "🏆",
+          regra: function (s) { return s.concluidas >= 10; } },
+
+        // ---------- Avaliações ----------
+        { nome: "Voz firme", descricao: "Avalie 10 obras", xp: 40, icone: "🎯",
+          regra: function (s) { return s.avaliadas >= 10; } },
+
+        // ---------- Anotações ----------
+        { nome: "Diarista dedicado", descricao: "Faça 10 anotações", xp: 40, icone: "📝",
+          regra: function (s) { return s.anotacoes >= 10; } },
+
+        { nome: "Cronista", descricao: "Faça 50 anotações", xp: 100, icone: "🖋️",
+          regra: function (s) { return s.anotacoes >= 50; } },
+
+        // ---------- Categorias ----------
+        { nome: "Mundos diferentes", descricao: "Registre histórias de 3 tipos diferentes", xp: 40, icone: "🧭",
+          regra: function (s) { return s.tipos >= 3; } },
+
+        { nome: "Explorador de histórias", descricao: "Registre os 6 tipos de obra", xp: 100, icone: "🗺️",
+          regra: function (s) { return s.tipos >= 6; } },
+
+        // ---------- Favoritos ----------
+        { nome: "Coração cheio", descricao: "Marque 3 obras como favoritas", xp: 30, icone: "💖",
+          regra: function (s) { return s.favoritos >= 3; } },
+
+        // ---------- Sequências ----------
+        { nome: "Hábito de estrela", descricao: "Registre algo por 3 dias seguidos", xp: 30, icone: "🔥",
+          regra: function (s) { return s.sequencia >= 3; } },
+
+        { nome: "Semana estrelada", descricao: "Registre algo por 7 dias seguidos", xp: 80, icone: "🌠",
+          regra: function (s) { return s.sequencia >= 7; } },
+
+        // ---------- XP ----------
+        { nome: "Estrela nascente", descricao: "Alcance 100 de XP", xp: 25, icone: "🌟",
+          regra: function (s) { return s.xp >= 100; } },
+
+        { nome: "Constelação", descricao: "Alcance 300 de XP", xp: 60, icone: "✨",
+          regra: function (s) { return s.xp >= 300; } }
+    ];
+
+
+    // -------------------------------------------------
+    // XP e nível
+    // -------------------------------------------------
+
+    const XP_POR_NIVEL = 100;
+
+    // O XP das ações é sempre recalculado a partir do diário.
+    // Assim, apagar e criar de novo não gera XP infinito.
+    const XP_ACOES = { obra: 10, concluida: 20, anotacao: 5 };
+
+    function xpDasAcoes(s) {
+        return s.obras * XP_ACOES.obra +
+               s.concluidas * XP_ACOES.concluida +
+               s.anotacoes * XP_ACOES.anotacao;
+    }
+
+    function infoNivel(xp) {
+        xp = Math.max(0, xp || 0);
+        const nivel = Math.floor(xp / XP_POR_NIVEL) + 1;
+        const noNivel = xp % XP_POR_NIVEL;
+        return {
+            nivel: nivel,
+            xpNoNivel: noNivel,
+            xpParaProximo: XP_POR_NIVEL,
+            porcentagem: Math.round((noNivel / XP_POR_NIVEL) * 100)
+        };
+    }
+
+    // Maior sequência de dias seguidos, dada uma lista de datas "AAAA-MM-DD"
+    function maiorSequencia(datas) {
+        const dias = Array.from(new Set(datas.filter(Boolean)))
+            .map(function (d) { return Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) / 86400000; })
+            .sort(function (a, b) { return a - b; });
+
+        let melhor = 0, atual = 0;
+        dias.forEach(function (d, i) {
+            atual = (i > 0 && d - dias[i - 1] === 1) ? atual + 1 : 1;
+            if (atual > melhor) { melhor = atual; }
+        });
+        return melhor;
+    }
+
+    const api = {
+        CONQUISTAS: CONQUISTAS,
+        XP_POR_NIVEL: XP_POR_NIVEL,
+        XP_ACOES: XP_ACOES,
+        xpDasAcoes: xpDasAcoes,
+        infoNivel: infoNivel,
+        maiorSequencia: maiorSequencia
+    };
+
+    if (typeof module !== "undefined" && module.exports) {
+        module.exports = api;
+    } else {
+        raiz.StelliferDef = api;
+    }
+
+})(typeof window !== "undefined" ? window : globalThis);

@@ -2,18 +2,24 @@
 // USUÁRIO LOGADO
 // ========================================
 
-const usuarioLogado = JSON.parse(
-    localStorage.getItem("usuarioLogado")
-);
+let usuarioLogado = null;
+
+try {
+    usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+} catch (erro) {
+    usuarioLogado = null;
+}
+
+if (!usuarioLogado || !usuarioLogado.id_usuario) {
+    usuarioLogado = null;
+}
 
 
 // ========================================
 // ELEMENTOS DO PERFIL
 // ========================================
 
-const perfilBloqueado = document.querySelector(
-    ".perfil-conteudo-bloqueado"
-);
+const perfilCard = document.querySelector(".perfil-card");
 
 const loginOverlay = document.querySelector(
     ".login-overlay"
@@ -39,8 +45,8 @@ if (usuarioLogado) {
     // PERFIL
     // ------------------------------------
 
-    if (perfilBloqueado) {
-        perfilBloqueado.classList.remove("bloqueado");
+    if (perfilCard) {
+        perfilCard.classList.remove("bloqueado");
     }
 
     if (loginOverlay) {
@@ -63,8 +69,8 @@ if (usuarioLogado) {
     // USUÁRIO NÃO LOGADO
     // ------------------------------------
 
-    if (perfilBloqueado) {
-        perfilBloqueado.classList.add("bloqueado");
+    if (perfilCard) {
+        perfilCard.classList.add("bloqueado");
     }
 
     if (loginOverlay) {
@@ -76,4 +82,33 @@ if (usuarioLogado) {
         conquistasCard.classList.add("bloqueado");
     }
 
+}
+
+// ========================================
+// DADOS DO USUÁRIO NO CARD DE PERFIL
+// ========================================
+
+if (usuarioLogado) {
+
+    const nomeEl = document.getElementById("perfil-nome");
+    const usuarioEl = document.getElementById("perfil-usuario");
+    const nivelEl = document.getElementById("perfil-nivel");
+    const fotoEl = document.getElementById("perfil-foto");
+
+    if (nomeEl) { nomeEl.textContent = usuarioLogado.nome; }
+    if (usuarioEl) { usuarioEl.textContent = "@" + usuarioLogado.nome_usuario; }
+    if (fotoEl && usuarioLogado.foto_perfil) { fotoEl.src = usuarioLogado.foto_perfil; }
+
+    if (nivelEl && window.StelliferDef) {
+        nivelEl.textContent = "✦ Nível " + window.StelliferDef.infoNivel(usuarioLogado.xp).nivel;
+    }
+
+    // Clicar no card abre o perfil completo
+    const cartao = document.querySelector(".perfil-card");
+    if (cartao) {
+        cartao.style.cursor = "pointer";
+        cartao.addEventListener("click", function () {
+            window.location.href = "perfil.html";
+        });
+    }
 }

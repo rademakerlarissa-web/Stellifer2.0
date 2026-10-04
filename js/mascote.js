@@ -50,6 +50,13 @@
     // Onde ele pode subir (topo dos cards, título, botão...)
     const SELETOR_PLATAFORMAS = [
         ".stat-card",
+        ".obra-card",
+        ".numero-card",
+        ".conquista-card",
+        ".anotacao",
+        ".painel",
+        ".perfil-grande",
+        ".pagina-topo h1",
         ".highlight-work",
         ".work-card",
         ".note-card",
@@ -165,7 +172,8 @@
         acordar: ["Ahn? Eu dormi? 😴", "*bocejo*", "Hã? Quê?"],
         ioio: ["Olha esse truque!", "Sobe e desce, sobe e desce!"],
         danca: ["♪ la la la ♪", "Olha meu passinho!"],
-        largado: ["Wheee!", "Uiii!"]
+        largado: ["Wheee!", "Uiii!"],
+        ler: ["Hora de ler um pouquinho. 📖", "Esse capítulo está ótimo!", "Uma pausa para uma boa história."]
     };
 
 
@@ -311,6 +319,17 @@
       <circle class="m-pele" cx="0" cy="21.5" r="4.6"/>
       <rect class="m-camisa" x="-5.2" y="-2" width="10.4" height="11" rx="5"/>
     </g></g>
+
+    <!-- livro aberto durante a pausa de leitura -->
+    <g class="m-livro" style="display:none">
+      <path d="M0 -24 Q-7 -30 -16 -27 L-16 -10 Q-7 -12 0 -7 Q7 -12 16 -10 L16 -27 Q7 -30 0 -24 Z"
+            fill="#fff7dc" stroke="#8a6044" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M0 -24 L0 -7" fill="none" stroke="#8a6044" stroke-width="1.2"/>
+      <path class="m-livro-pagina" d="M3 -22 Q8 -25 13 -24 L13 -13 Q8 -14 3 -11 Z"
+            fill="#f0dcae" stroke="#c7a875" stroke-width="0.7"/>
+      <path d="M-12 -23 L-4 -21 M-12 -19 L-4 -17 M4 -20 L11 -22 M4 -16 L11 -18"
+            fill="none" stroke="#c7a875" stroke-width="0.7" stroke-linecap="round"/>
+    </g>
 
     <!-- cabeça -->
     <g transform="translate(0 -74)"><g class="m-cabeca">
@@ -481,6 +500,8 @@
                 pernaD: q(".m-perna-d"),
                 bracoE: q(".m-braco-e"),
                 bracoD: q(".m-braco-d"),
+                livro: q(".m-livro"),
+                livroPagina: q(".m-livro-pagina"),
                 cabeca: q(".m-cabeca"),
                 feicoes: q(".m-feicoes"),
                 olhosAbertos: q(".m-olhos-abertos"),
@@ -643,7 +664,7 @@
         const angulo = p.lie * 90 * p.lieDir + p.lean * (1 - p.lie);
 
         P.pose.setAttribute("transform",
-            "translate(" + f(p.jx) + " " + f(p.bob - p.lie * 17) + ") " +
+            "translate(" + f(p.jx) + " " + f(p.bob - p.lie * 17 + p.sit * 20) + ") " +
             "rotate(" + f(angulo) + ") " +
             "scale(" + f(p.sx) + " " + f(p.sq) + ")");
 
@@ -656,14 +677,18 @@
 
         // Membros
         P.pernaE.setAttribute("transform",
-            "translate(0 " + f(-p.liftL) + ") rotate(" + f(p.lL) + ")");
+            "translate(0 " + f(-p.liftL) + ") rotate(" + f(lerp(p.lL, 90, p.sit)) + ")");
 
         P.pernaD.setAttribute("transform",
-            "translate(0 " + f(-p.liftR) + ") rotate(" + f(-p.lR) + ")");
+            "translate(0 " + f(-p.liftR) + ") rotate(" + f(lerp(-p.lR, -90, p.sit)) + ")");
 
-        P.bracoE.setAttribute("transform", "rotate(" + f(p.aL) + ")");
+        P.bracoE.setAttribute("transform", "rotate(" + f(lerp(p.aL, -35, p.sit)) + ")");
 
-        P.bracoD.setAttribute("transform", "rotate(" + f(-p.aR) + ")");
+        P.bracoD.setAttribute("transform", "rotate(" + f(lerp(-p.aR, 35, p.sit)) + ")");
+
+        P.livro.style.display = p.livro ? "" : "none";
+        P.livroPagina.setAttribute("transform",
+            "scale(" + f(0.82 + Math.abs(Math.sin(M.tG * 1.4)) * 0.18) + " 1)");
 
         // Cabeça e rosto
         P.cabeca.setAttribute("transform",
@@ -726,7 +751,7 @@
     const REPOUSO = {
         aL: 8, aR: 8, lL: 0, lR: 0, liftL: 0, liftR: 0,
         lean: 0, tilt: 0, lie: 0, lieDir: 1,
-        bob: 0, sq: 1, sx: 1, jx: 0,
+        bob: 0, sq: 1, sx: 1, jx: 0, sit: 0, livro: false,
         look: 0, lookY: 0, blink: 0,
         expr: "smile", fx: [], yoyo: false, yoyoLen: 0, yoyoRot: 0
     };
@@ -774,7 +799,7 @@
     const BASE = {
         aL: 8, aR: 8, lL: 0, lR: 0, liftL: 0, liftR: 0,
         lean: 0, tilt: 0, lie: 0, bob: 0, sq: 1, sx: 1, jx: 0,
-        look: 0, lookY: 0,
+        look: 0, lookY: 0, sit: 0, livro: false,
         expr: "smile", yoyo: false, yoyoLen: 0, yoyoRot: 0
     };
 
@@ -783,7 +808,7 @@
     const VELOCIDADE_SUAVE = {
         aL: 18, aR: 18, lL: 20, lR: 20, liftL: 30, liftR: 30,
         lean: 12, tilt: 12, lie: 7, bob: 35, sq: 30, sx: 40, jx: 90,
-        look: 10, lookY: 10
+        look: 10, lookY: 10, sit: 4
     };
 
     const ult = { x: 0, y: 0, tem: false };      // último ponto do mouse
@@ -1182,6 +1207,21 @@
         await esperar(meu, 1.4);
     }
 
+    async function aLer(meu) {
+
+        if (M.sup) {
+            await aDescer(meu);
+        }
+
+        M.modo = "ler";
+
+        if (Math.random() < 0.65) {
+            say(pick(FALAS.ler), 3000);
+        }
+
+        await esperar(meu, rnd(12, 20));
+    }
+
     async function aDancar(meu) {
 
         const tipo = pick(["sway", "hop", "spin", "disco"]);
@@ -1452,6 +1492,7 @@
             add(aIoio, 10);
             add(aEscalar, plataformasAlcancaveis().length ? 24 : 0);
             add(aDormir, 4);
+            add(aLer, 5);
 
         } else {
 
@@ -1558,6 +1599,20 @@
 
             T.tilt = Math.sin(tg * 0.8) * 3;
 
+            return;
+        }
+
+        if (m === "ler") {
+            T.sit = 1;
+            T.aL = -35;
+            T.aR = -35;
+            T.lL = 90;
+            T.lR = 90;
+            T.lookY = 1;
+            T.tilt = 5 + Math.sin(t * 1.3) * 2;
+            T.bob = Math.sin(t * 1.8) * 0.35;
+            T.expr = "smile";
+            T.livro = true;
             return;
         }
 
@@ -1929,6 +1984,7 @@
         cur.yoyo = T.yoyo;
         cur.yoyoLen = T.yoyoLen;
         cur.yoyoRot = T.yoyoRot;
+        cur.livro = T.livro;
         cur.lieDir = M.lieDir;
     }
 
