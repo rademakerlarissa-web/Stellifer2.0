@@ -283,3 +283,16 @@
 .conquistas-login-overlay button:hover {
     transform: translateY(-2px);
 }
+
+
+/* ========================================
+   CONQUISTAS BLOQUEADAS
+======================================== */
+
+.conquistas-card.bloqueado .conquistas-lista {
+    filter: blur(5px);
+    user-select: none;
+    pointer-events: none;
+}
+
+
