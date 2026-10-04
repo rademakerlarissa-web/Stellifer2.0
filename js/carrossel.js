@@ -11,7 +11,7 @@
     const indicatorsContainer = document.querySelector(".carousel-indicators");
     const previousButton = document.querySelector(".carousel-button.prev");
     const nextButton = document.querySelector(".carousel-button.next");
-    const carouselTime = 5000;
+    const carouselTime = 10000;
     const fundosPasteis = [
         { titulo: "Minhas histórias, minhas memórias.", texto: "Um lugar para guardar aquilo que vivi através das histórias." },
         { titulo: "Cada história deixa uma marca.", texto: "Registre seus momentos favoritos." },
