@@ -1,5 +1,9 @@
+//protegendo o MySQL com variáveis de ambiente
+require('dotenv').config();
+const mysql = require('mysql2');
+
+
 const express = require("express");
-const mysql = require("mysql2");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 
@@ -19,15 +23,11 @@ app.use(cors());
 // CONEXÃO COM O MYSQL
 // ================================
 
-const conexao = mysql.createConnection({
-
-    host: "localhost",
-
-    user: "root",
-
-    password: "SENHA_REMOVIDA",
-
-    database: "stellifer_db1"
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 
