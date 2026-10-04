@@ -2,6 +2,9 @@
 
 > **Seu diário pessoal para guardar as histórias que fizeram parte da sua jornada.**
 
+[🌐 Acessar o Stellifer](https://rademakerlarissa-web.github.io/Stellifer2.0/) • [💻 Ver o código-fonte](https://github.com/rademakerlarissa-web/Stellifer2.0)
+
+
 O **Stellifer** é uma aplicação web desenvolvida para funcionar como um diário pessoal de obras audiovisuais e literárias.
 
 A proposta é permitir que cada usuário registre e organize histórias que já conheceu, está conhecendo ou ainda deseja conhecer, podendo atribuir avaliações, registrar anotações, guardar citações, marcar favoritos e acompanhar sua própria evolução através de estatísticas e conquistas.

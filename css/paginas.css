@@ -2168,12 +2168,87 @@ nav a.ativo::after {
 
 @media (max-width: 650px) {
 
+    .pagina {
+        width: calc(100% - 24px);
+        margin-top: 18px;
+    }
+
+    .pagina-topo {
+        gap: 11px;
+        margin-bottom: 20px;
+        padding: 18px 15px;
+        border-radius: 17px;
+    }
+
+    .pagina-topo > div {
+        flex-basis: 100%;
+    }
+
+    .pagina-topo > div:first-child::before {
+        margin-bottom: 10px;
+    }
+
+    .pagina-topo h1 {
+        font-size: clamp(27px, 7.5vw, 34px);
+    }
+
+    .pagina-topo p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .voltar {
+        margin-bottom: 10px;
+    }
+
+    .secao {
+        margin-bottom: 32px;
+    }
+
+    .secao > h2 {
+        font-size: 21px;
+    }
+
+    .painel {
+        padding: 17px 14px;
+    }
+
+    .barra-diario {
+        align-items: stretch;
+        gap: 9px;
+        margin-bottom: 16px;
+    }
+
+    .filtros {
+        width: 100%;
+        gap: 6px;
+    }
+
+    .filtro {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .busca-diario {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+    }
+
+    .busca-diario input,
+    .busca-diario select {
+        min-width: 0;
+        width: 100%;
+        padding: 8px 9px;
+    }
+
     .ficha {
         grid-template-columns: 1fr;
     }
 
     .ficha-capa {
-        max-width: 230px;
+        max-width: 200px;
         margin: 0 auto;
     }
 
@@ -2184,24 +2259,50 @@ nav a.ativo::after {
 
     .grade-obras {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        gap: 8px;
     }
 
     .obra-card .capa,
     .obra-card .capa-vazia {
-        height: 210px;
+        height: clamp(145px, 52vw, 185px);
     }
 
     .obra-card-info {
-        padding: 12px 13px 14px;
+        padding: 9px;
     }
 
     .obra-card h3 {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .janela-corpo {
-        padding: 24px 20px;
+        padding: 18px 14px;
+    }
+
+    .resumo-conquistas {
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 28px;
+        padding: 18px;
+        text-align: center;
+    }
+
+    .resumo-conquistas .anel {
+        width: 88px;
+        height: 88px;
+    }
+
+    .resumo-conquistas h2 {
+        font-size: 21px;
+    }
+
+    .cartoes-numeros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .numero-card {
+        padding: 13px 10px;
     }
 
     .lista-info {

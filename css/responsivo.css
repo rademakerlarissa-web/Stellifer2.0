@@ -107,6 +107,21 @@
         grid-template-columns:
             repeat(2, 1fr);
     }
+
+    .layout-principal {
+        grid-template-columns: minmax(0, 1fr) 250px;
+    }
+}
+
+@media (max-width: 750px) {
+
+    .layout-principal {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .lateral {
+        position: static;
+    }
 }
 
 
@@ -121,11 +136,11 @@
     header {
 
         padding:
-            15px 5%;
+            13px 4%;
 
         flex-direction: column;
 
-        gap: 12px;
+        gap: 10px;
     }
 
 
@@ -141,13 +156,13 @@
 
         justify-content: center;
 
-        gap: 18px;
+        gap: clamp(10px, 3vw, 18px);
     }
 
 
     nav a {
 
-        font-size: 13px;
+        font-size: 12px;
     }
 
 
@@ -171,15 +186,15 @@
 
     .carousel {
 
-        padding-top: 20px;
+        padding: 12px 0 6px;
     }
 
 
     .carousel-container {
 
-        width: 92%;
+        width: calc(100% - 28px);
 
-        height: 330px;
+        height: clamp(205px, 60vw, 250px);
 
         border-radius:
             18px;
@@ -188,45 +203,55 @@
 
     .carousel-caption {
 
-        left: 25px;
+        left: 20px;
 
-        right: 25px;
+        right: 20px;
 
-        bottom: 45px;
+        bottom: 42px;
     }
 
+    .carousel-citacao {
+        left: 16px;
+        right: 16px;
+        bottom: 38px;
+        padding: 12px 14px;
+    }
+
+    .carousel-citacao cite {
+        font-size: 12px;
+    }
 
     .carousel-caption h2 {
 
-        font-size: 25px;
+        font-size: clamp(19px, 5.6vw, 23px);
     }
 
 
     .carousel-caption p {
 
-        font-size: 14px;
+        font-size: 12px;
     }
 
 
     .carousel-button {
 
-        width: 36px;
+        width: 34px;
 
-        height: 36px;
+        height: 34px;
 
-        font-size: 18px;
+        font-size: 16px;
     }
 
 
     .carousel-button.prev {
 
-        left: 10px;
+        left: 8px;
     }
 
 
     .carousel-button.next {
 
-        right: 10px;
+        right: 8px;
     }
 
 
@@ -234,15 +259,15 @@
 
     .welcome {
 
-        margin-top: 45px;
+        width: calc(100% - 36px);
 
-        margin-bottom: 55px;
+        margin: 24px auto 32px;
     }
 
 
     .welcome h1 {
 
-        font-size: 42px;
+        font-size: clamp(30px, 8vw, 36px);
 
         letter-spacing: -1px;
     }
@@ -250,7 +275,15 @@
 
     .welcome p {
 
-        font-size: 16px;
+        margin-bottom: 18px;
+
+        font-size: 14px;
+    }
+
+    .add-button {
+        min-height: 42px;
+        padding: 10px 16px;
+        font-size: 13px;
     }
 
 
@@ -264,13 +297,13 @@
         flex-direction:
             column;
 
-        gap: 12px;
+        gap: 9px;
     }
 
 
     .section-title h2 {
 
-        font-size: 28px;
+        font-size: 22px;
     }
 
 
@@ -282,6 +315,124 @@
             1fr;
     }
 
+    .layout-principal {
+        width: calc(100% - 28px);
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .conteudo-principal,
+    .lateral {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .lateral {
+        position: static;
+        gap: 14px;
+    }
+
+    .perfil-card {
+        padding: 22px 18px;
+    }
+
+    .perfil-foto {
+        width: 84px;
+        height: 84px;
+        margin-bottom: 11px;
+    }
+
+    .conquistas-card {
+        padding: 18px;
+    }
+
+    .statistics,
+    .continuing,
+    .latest-notes {
+        width: 100%;
+        margin: 0 0 34px;
+    }
+
+    .statistics .section-title {
+        align-items: stretch;
+    }
+
+    .statistics-filters {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .date-selectors {
+        width: 100%;
+    }
+
+    .date-selectors select {
+        min-width: 0;
+        flex: 1;
+        padding: 8px 10px;
+    }
+
+    .filter-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .filter-button {
+        min-width: 0;
+        min-height: 40px;
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+
+    .stat-card {
+        padding: 18px 16px;
+        border-radius: 16px;
+    }
+
+    .rating-content {
+        gap: 14px;
+    }
+
+    .rating-circle {
+        width: 125px;
+        height: 125px;
+    }
+
+    .rating-circle-center {
+        width: 88px;
+        height: 88px;
+    }
+
+    .works-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .work-card img,
+    .work-cover-placeholder {
+        height: clamp(160px, 48vw, 195px);
+    }
+
+    .work-info {
+        padding: 13px;
+    }
+
+    .notes-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .note-card {
+        padding: 17px;
+    }
+
+    .status-legend {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 16px;
+    }
+
 
     .stat-card:last-child {
 
@@ -289,52 +440,75 @@
             auto;
     }
 
-
-    /* Obras */
-
-    .works-grid {
-
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .work-card img {
-
-        height: 300px;
-    }
-
-
-    /* Anotações */
-
-    .notes-grid {
-
-        grid-template-columns:
-            1fr;
-    }
-
-
     /* Rodapé */
 
     footer {
 
-        margin-top: 70px;
+        margin-top: 36px;
 
         padding:
-            30px 5%;
+            24px 5%;
     }
-
-    /* Status */
-
-    .status-legend {
-        flex-direction: column;
-        gap: 12px;
-    }
-
 
     /* Destaques */
 
     .highlights-list {
         grid-template-columns: 1fr;
+    }
+
+    .status-legend {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+    }
+
+    .carousel-citacao blockquote {
+        font-size: clamp(15px, 4.3vw, 19px);
+        line-height: 1.3;
+    }
+
+    .carousel-citacao-longa blockquote,
+    .carousel-citacao-muito-longa blockquote {
+        font-size: clamp(13px, 3.8vw, 16px);
+    }
+}
+
+@media (max-width: 380px) {
+
+    header {
+        padding-right: 3%;
+        padding-left: 3%;
+    }
+
+    nav {
+        gap: 8px;
+    }
+
+    nav a {
+        font-size: 11px;
+    }
+
+    .welcome {
+        width: calc(100% - 28px);
+    }
+
+    .filter-button {
+        font-size: 11px;
+    }
+
+    .carousel-container {
+        width: calc(100% - 20px);
+        height: 205px;
+        border-radius: 16px;
+    }
+
+    .welcome h1 {
+        font-size: 30px;
+    }
+
+    .statistics,
+    .continuing,
+    .latest-notes {
+        margin-bottom: 28px;
     }
 }

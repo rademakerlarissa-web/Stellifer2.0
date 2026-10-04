@@ -306,32 +306,90 @@ body {
 @media (max-width: 750px) {
 
     body {
-        padding: 15px;
+        min-height: 100vh;
+        align-items: flex-start;
+        padding: 12px;
     }
 
     .cadastro-container {
+        max-width: 520px;
+        margin: auto;
         grid-template-columns: 1fr;
+        border-radius: 22px;
     }
 
     .cadastro-intro {
-        min-height: 300px;
-
-        padding: 40px 30px;
+        min-height: 0;
+        padding: 20px 18px;
+        background-position: center;
     }
 
     .cadastro-intro .logo {
-        margin-bottom: 20px;
+        gap: 9px;
+        margin-bottom: 12px;
     }
 
     .logo h1 {
-        font-size: 2.5rem;
+        font-size: clamp(1.85rem, 7vw, 2.25rem);
+    }
+
+    .logo-estrelas {
+        font-size: 1.15rem;
     }
 
     .cadastro-intro h2 {
-        font-size: 1.4rem;
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+    }
+
+    .cadastro-intro p {
+        max-width: 320px;
+        font-size: 0.82rem;
+        line-height: 1.4;
     }
 
     .cadastro-card {
-        padding: 40px 30px;
+        padding: 24px 20px;
+    }
+
+    .cadastro-card h2 {
+        font-size: 1.55rem;
+    }
+
+    .cadastro-subtitle {
+        margin-bottom: 18px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group input {
+        padding: 12px 13px;
+        font-size: 16px;
+    }
+
+    .login-text {
+        margin-top: 19px;
+        font-size: 0.88rem;
+    }
+}
+
+@media (max-width: 380px) {
+
+    body {
+        padding: 8px;
+    }
+
+    .cadastro-container {
+        border-radius: 18px;
+    }
+
+    .cadastro-intro {
+        padding: 20px 16px;
+    }
+
+    .cadastro-card {
+        padding: 22px 16px;
     }
 }

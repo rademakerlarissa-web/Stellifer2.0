@@ -31,7 +31,7 @@ const db = mysql.createConnection({
 });
 
 
-conexao.connect((erro) => {
+db.connect((erro) => {
 
     if (erro) {
 
@@ -83,7 +83,7 @@ app.post("/cadastro", async (req, res) => {
     try {
 
         // Verifica se o nome de usuário ou e-mail já existem
-        const [usuarios] = await conexao.promise().query(
+        const [usuarios] = await db.promise().query(
             `
             SELECT id_usuario
             FROM usuario
@@ -107,7 +107,7 @@ app.post("/cadastro", async (req, res) => {
 
 
         // Insere o usuário no banco
-        await conexao.promise().query(
+        await db.promise().query(
             `
             INSERT INTO usuario
             (nome, nome_usuario, email, senha)
@@ -164,7 +164,7 @@ app.post("/login", async (req, res) => {
     try {
 
         // Procura pelo e-mail OU nome de usuário
-        const [usuarios] = await conexao.promise().query(
+        const [usuarios] = await db.promise().query(
             `
             SELECT *
             FROM usuario
@@ -241,7 +241,7 @@ app.post("/login", async (req, res) => {
 // PERFIL, DIÁRIO, ANOTAÇÕES E CONQUISTAS
 // ================================
 
-require("./rotas/stellifer")(app, conexao);
+require("./rotas/stellifer")(app, db);
 
 
 // ================================
