@@ -26,6 +26,7 @@
     let carouselInterval = null;
     let currentCitation = 0;
     let citationsInterval = null;
+    let renderVersion = 0;
 
     if (!container || !slidesContainer || !indicatorsContainer) { return; }
 
@@ -178,11 +179,31 @@
         return slide;
     }
 
-    function renderizar(imagens, citacoes) {
-        const lista = Array.isArray(imagens) && imagens.length > 0
-            ? imagens
-            : fundosPasteis;
-        const pastel = !(Array.isArray(imagens) && imagens.length > 0);
+    function imagemHorizontal(dados) {
+        return new Promise(function (resolve) {
+            const imagem = new Image();
+            imagem.onload = function () {
+                resolve(imagem.naturalWidth >= imagem.naturalHeight);
+            };
+            imagem.onerror = function () { resolve(false); };
+            imagem.src = dados.imagem;
+        });
+    }
+
+    async function renderizar(imagens, citacoes) {
+        const versao = ++renderVersion;
+        const imagensValidas = Array.isArray(imagens)
+            ? await Promise.all(imagens.map(async function (dados) {
+                return dados && dados.imagem && await imagemHorizontal(dados) ? dados : null;
+            }))
+            : [];
+
+        if (versao !== renderVersion) { return; }
+
+        const imagensPaisagem = imagensValidas.filter(Boolean);
+        const temImagens = imagensPaisagem.length > 0;
+        const lista = temImagens ? imagensPaisagem : fundosPasteis;
+        const pastel = !temImagens;
 
         slidesContainer.replaceChildren();
         indicatorsContainer.replaceChildren();
