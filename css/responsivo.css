@@ -111,6 +111,10 @@
     .layout-principal {
         grid-template-columns: minmax(0, 1fr) 250px;
     }
+
+    .video-carousel-section {
+        width: 100%;
+    }
 }
 
 @media (max-width: 750px) {
@@ -347,6 +351,34 @@
     .lateral {
         width: 100%;
         min-width: 0;
+    }
+
+    .video-carousel-section {
+        margin-bottom: 28px;
+    }
+
+    .video-carousel-header {
+        text-align: center;
+    }
+
+    .video-carousel-stage {
+        min-height: 190px;
+        max-height: 60vh;
+        border-radius: 16px;
+    }
+
+    .video-carousel-button {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+    }
+
+    .video-carousel-button.prev {
+        left: 8px;
+    }
+
+    .video-carousel-button.next {
+        right: 8px;
     }
 
     .lateral {

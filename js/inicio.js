@@ -21,6 +21,7 @@
     const listaConquistas = document.querySelector(".conquistas-lista");
     let itens = [];
     let anotacoes = [];
+    let videosInicio = [];
 
     function estadoVazio(conteiner, titulo, texto, classe) {
         conteiner.replaceChildren();
@@ -162,11 +163,11 @@
         if (typeof window.atualizarCarrosselInicio !== "function") { return; }
 
         const imagens = [];
+        const videos = videosInicio.slice();
         const citacoesInicio = [];
         const usadas = new Set();
-        const itensPorId = new Map(itens.map(function (item) {
-            return [String(item.id), item];
-        }));
+        const gruposPorObra = new Map();
+        const grupos = [];
 
         function extrairCitacoes(valor) {
             if (Array.isArray(valor)) {
@@ -180,42 +181,67 @@
             }).filter(Boolean);
         }
 
-        function adicionarImagem(src, alt, citacoes, titulo, indice) {
+        function grupoDaObra(itemId, titulo, citacoes) {
+            const chave = String(itemId);
+            if (!gruposPorObra.has(chave)) {
+                const grupo = { titulo: titulo, citacoes: citacoes, imagens: [] };
+                gruposPorObra.set(chave, grupo);
+                grupos.push(grupo);
+            }
+            return gruposPorObra.get(chave);
+        }
+
+        function adicionarImagem(grupo, src, alt) {
             if (typeof src !== "string" || !src.trim() || usadas.has(src)) { return; }
             usadas.add(src);
-            const citacao = citacoes.length > 0
-                ? citacoes[indice % citacoes.length]
-                : "";
-            imagens.push({ imagem: src, alt: alt, citacao: citacao, obra: titulo });
+            const indice = grupo.imagens.length;
+            grupo.imagens.push({
+                imagem: src,
+                alt: alt,
+                citacao: grupo.citacoes.length ? grupo.citacoes[indice % grupo.citacoes.length] : "",
+                obra: grupo.titulo
+            });
         }
 
         itens.forEach(function (item) {
             const titulo = item.obra && item.obra.titulo ? item.obra.titulo : "obra do diário";
             const citacoes = extrairCitacoes(item.citacoes);
+            const grupo = grupoDaObra(item.id, titulo, citacoes);
             citacoes.forEach(function (citacao) {
                 citacoesInicio.push({ citacao: citacao, obra: titulo });
             });
-            let indiceImagem = 0;
             if (item.obra) {
-                adicionarImagem(item.obra.capa, "Capa de " + titulo, citacoes, titulo, indiceImagem);
-                indiceImagem += 1;
+                adicionarImagem(grupo, item.obra.capa, "Capa de " + titulo);
             }
             (Array.isArray(item.imagens) ? item.imagens : []).forEach(function (src, index) {
-                adicionarImagem(src, "Imagem " + (index + 1) + " de " + titulo, citacoes, titulo, indiceImagem);
-                indiceImagem += 1;
+                adicionarImagem(grupo, src, "Imagem " + (index + 1) + " de " + titulo);
             });
         });
 
         anotacoes.forEach(function (anotacao) {
             const titulo = anotacao.obraTitulo || "anotação";
-            const item = itensPorId.get(String(anotacao.itemId));
+            const item = itens.find(function (obra) { return String(obra.id) === String(anotacao.itemId); });
             const citacoes = item ? extrairCitacoes(item.citacoes) : [];
+            const grupo = grupoDaObra(anotacao.itemId, titulo, citacoes);
             (Array.isArray(anotacao.imagens) ? anotacao.imagens : []).forEach(function (src, index) {
-                adicionarImagem(src, "Imagem " + (index + 1) + " da anotação de " + titulo, citacoes, titulo, index);
+                adicionarImagem(grupo, src, "Imagem " + (index + 1) + " da anotação de " + titulo);
             });
         });
 
-        window.atualizarCarrosselInicio(imagens, citacoesInicio);
+        let restantes = true;
+        let indice = 0;
+        while (restantes) {
+            restantes = false;
+            grupos.forEach(function (grupo) {
+                if (indice < grupo.imagens.length) {
+                    imagens.push(grupo.imagens[indice]);
+                    restantes = true;
+                }
+            });
+            indice += 1;
+        }
+
+        window.atualizarCarrosselInicio(imagens, citacoesInicio, videos);
     }
 
     estadoVazio(listaObras, "Carregando seu diário...", "", "obra-vazia");
@@ -234,6 +260,23 @@
         renderizarObras(itens);
     }).catch(function (erro) {
         estadoVazio(listaObras, "Não foi possível carregar o diário", erro.message, "obra-vazia");
+    });
+
+    function carregarVideosInicio() {
+        obterJson(caminho + "/videos").then(function (dados) {
+            if (!Array.isArray(dados)) {
+                throw new Error("O servidor retornou uma lista de vídeos inválida.");
+            }
+            videosInicio = dados;
+            atualizarCarrossel();
+        }).catch(function (erro) {
+            console.error("Não foi possível carregar os vídeos do carrossel:", erro);
+        });
+    }
+
+    carregarVideosInicio();
+    window.addEventListener("pageshow", function (evento) {
+        if (evento.persisted) { carregarVideosInicio(); }
     });
 
     obterJson(caminho + "/anotacoes").then(function (dados) {

@@ -512,7 +512,7 @@
                         texto: "Uma história calma e cheia de saudade. Cada episódio parece uma carta para o passado.",
                         melhoresMomentos: "O reencontro na vila\nA conversa sob as estrelas",
                         citacoes: "As coisas que parecem pequenas podem guardar o maior significado.",
-                        favorito: true, imagens: [],
+                        favorito: true, imagens: [], videos: [],
                         obra: { id: 1, titulo: "Uma jornada de exemplo", autor: "Autora de exemplo", tipo: "Anime",
                                 capa: "imagens/obra1.jpg", sinopse: "Esta é uma obra de exemplo para você ver como o diário fica.",
                                 generos: ["Fantasia", "Aventura"] }
@@ -520,13 +520,13 @@
                     {
                         id: 2, status: "concluida", nota: 4, dataInicio: deslocar(d, -20), dataConclusao: ontem,
                         texto: "Terminei de ler numa noite de chuva.", melhoresMomentos: "", citacoes: "",
-                        favorito: false, imagens: [],
+                        favorito: false, imagens: [], videos: [],
                         obra: { id: 2, titulo: "Livro de exemplo", autor: "Autor de exemplo", tipo: "Livro",
                                 capa: "imagens/obra2.jpg", sinopse: "", generos: ["Aventura"] }
                     },
                     {
                         id: 3, status: "quero", nota: null, dataInicio: null, dataConclusao: null,
-                        texto: "", melhoresMomentos: "", citacoes: "", favorito: false, imagens: [],
+                        texto: "", melhoresMomentos: "", citacoes: "", favorito: false, imagens: [], videos: [],
                         obra: { id: 3, titulo: "Série para assistir", autor: "", tipo: "Série",
                                 capa: "imagens/obra3.jpg", sinopse: "", generos: [] }
                     }
@@ -566,6 +566,14 @@
                 favoritos: validos.filter(function (i) { return i.favorito; }).length,
                 tipos: tipos.size,
                 anotacoes: d.anotacoes.length,
+                imagens: d.itens.reduce(function (total, item) {
+                    return total + (Array.isArray(item.imagens) ? item.imagens.length : 0);
+                }, 0) + d.anotacoes.reduce(function (total, anotacao) {
+                    return total + (Array.isArray(anotacao.imagens) ? anotacao.imagens.length : 0);
+                }, 0),
+                videos: d.itens.reduce(function (total, item) {
+                    return total + (Array.isArray(item.videos) ? item.videos.length : 0);
+                }, 0),
                 sequencia: Def.maiorSequencia(datas)
             };
         }
@@ -694,6 +702,12 @@
                     citacoes: dados.citacoes || "",
                     favorito: !!dados.favorito,
                     imagens: dados.imagens || [],
+                    videos: (dados.videos || []).map(function (video, index) {
+                        if (typeof video !== "string") { return video; }
+                        const rotacoes = Array.isArray(dados.rotacoesVideos) ? dados.rotacoesVideos : [];
+                        const rotacao = [0, 90, 180, 270].includes(rotacoes[index]) ? rotacoes[index] : 0;
+                        return { video: video, rotacao: rotacao };
+                    }),
                     obra: {
                         titulo: String(dados.obra.titulo).trim(),
                         autor: dados.obra.autor || "",

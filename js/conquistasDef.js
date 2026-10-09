@@ -138,7 +138,38 @@
           regra: function (s) { return s.sequencia >= 14; } },
 
         { nome: "Mês inteiro de memórias", descricao: "Registre algo por 30 dias seguidos", xp: 250, icone: "🌙",
-          regra: function (s) { return s.sequencia >= 30; } }
+          regra: function (s) { return s.sequencia >= 30; } },
+
+        // ---------- Imagens e vídeos ----------
+        { nome: "Primeiro registro visual", descricao: "Adicione sua primeira imagem a uma obra ou anotação", xp: 15, icone: "🖼️",
+          regra: function (s) { return s.imagens >= 1; } },
+
+        { nome: "Álbum de memórias", descricao: "Guarde 5 imagens no Stellifer", xp: 25, icone: "📸",
+          regra: function (s) { return s.imagens >= 5; } },
+
+        { nome: "Olhar atento", descricao: "Guarde 10 imagens no Stellifer", xp: 40, icone: "🌄",
+          regra: function (s) { return s.imagens >= 10; } },
+
+        { nome: "Galeria estrelada", descricao: "Guarde 25 imagens no Stellifer", xp: 75, icone: "🎨",
+          regra: function (s) { return s.imagens >= 25; } },
+
+        { nome: "Arquivo visual", descricao: "Guarde 50 imagens no Stellifer", xp: 125, icone: "🗃️",
+          regra: function (s) { return s.imagens >= 50; } },
+
+        { nome: "Primeiro vídeo", descricao: "Adicione seu primeiro vídeo a uma obra", xp: 15, icone: "🎥",
+          regra: function (s) { return s.videos >= 1; } },
+
+        { nome: "Coleção em movimento", descricao: "Adicione 3 vídeos às suas obras", xp: 25, icone: "🎞️",
+          regra: function (s) { return s.videos >= 3; } },
+
+        { nome: "Memórias em movimento", descricao: "Adicione 5 vídeos às suas obras", xp: 40, icone: "📽️",
+          regra: function (s) { return s.videos >= 5; } },
+
+        { nome: "Cineasta de memórias", descricao: "Adicione 10 vídeos às suas obras", xp: 75, icone: "🎬",
+          regra: function (s) { return s.videos >= 10; } },
+
+        { nome: "Festival particular", descricao: "Adicione 25 vídeos às suas obras", xp: 125, icone: "🍿",
+          regra: function (s) { return s.videos >= 25; } }
     ];
 
 

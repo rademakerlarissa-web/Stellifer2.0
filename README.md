@@ -46,8 +46,11 @@ Cada obra possui uma página própria com informações detalhadas, incluindo:
 - data de conclusão;
 - indicação de favorita;
 - imagens;
+- links de vídeos do YouTube;
 - citações;
 - anotações.
+
+Os vídeos adicionados por link também aparecem em um carrossel na página inicial, entre as estatísticas e a seção “Continuando...”. O Stellifer armazena apenas o identificador do vídeo; a reprodução é feita pelo YouTube e depende de conexão com a internet. Arquivos MP4/WebM salvos em versões anteriores continuam sendo exibidos.
 
 ![Página da obra](docs/screenshots/obra.png)
 
@@ -58,7 +61,7 @@ O Stellifer possui um sistema de conquistas que transforma o registro das obras 
 
 As conquistas são desbloqueadas conforme o usuário utiliza a plataforma e realiza determinadas ações.
 
-Cada conquista pode conceder **XP**, contribuindo para a evolução do nível do usuário.
+Há conquistas por adicionar imagens às obras e anotações e por guardar vídeos nas obras, com marcos progressivos de quantidade. Cada conquista pode conceder **XP**, contribuindo para a evolução do nível do usuário.
 
 ![Conquistas](docs/screenshots/conquistas.png)
 
@@ -251,6 +254,8 @@ O modelo foi pensado para representar os principais elementos da aplicação, in
 - relacionamentos entre usuários e suas obras.
 
 As relações entre entidades são representadas através de estruturas relacionais e tabelas intermediárias quando necessário, evitando a duplicação de informações e mantendo a organização dos dados.
+
+Para que as mídias sejam armazenadas corretamente, `item_diario.imagens` e `anotacao.imagens` devem ser do tipo `LONGTEXT`: ambas guardam listas JSON com imagens em base64, e `item_diario.imagens` também guarda referências de vídeos. Links do YouTube são armazenados apenas pelo identificador do vídeo, sem copiar o arquivo para o banco. Vídeos MP4/WebM salvos em versões anteriores permanecem compatíveis. Se alguma coluna existente usar um tipo menor, migre-a para `LONGTEXT`, preservando as restrições de nulabilidade e valor padrão já configuradas. Para conferir os tipos atuais, use `SHOW COLUMNS FROM item_diario LIKE 'imagens';` e `SHOW COLUMNS FROM anotacao LIKE 'imagens';`.
 
 
 ---

@@ -25,7 +25,7 @@
 //
 //   • item_diario.status precisa aceitar: 'concluida', 'em_andamento',
 //     'abandonada' e 'quero' (quero ler/assistir).
-//   • imagens guarda um JSON (lista de imagens) → use LONGTEXT.
+//   • imagens guarda um JSON com imagens, IDs do YouTube e mídias antigas → use LONGTEXT.
 //   • capa e foto_perfil podem receber imagens em base64 → use LONGTEXT.
 
 const bcrypt = require("bcrypt");
@@ -33,6 +33,7 @@ const Def = require("../js/conquistasDef.js");
 
 const STATUS_VALIDOS = ["concluida", "em_andamento", "abandonada", "quero"];
 const TIPOS = ["Filme", "Livro", "Anime", "Mangá", "Série", "Dorama"];
+const LIMITE_VIDEOS_BYTES = 8 * 1024 * 1024;
 
 
 module.exports = function (app, conexao) {
@@ -54,12 +55,86 @@ module.exports = function (app, conexao) {
 
     function lerLista(texto) {
         if (!texto) { return []; }
+        if (Array.isArray(texto)) { return texto; }
         try {
             const lista = JSON.parse(texto);
             return Array.isArray(lista) ? lista : [];
         } catch (e) {
             return [];
         }
+    }
+
+    function extrairIdYoutube(valor) {
+        let url;
+        try {
+            url = new URL(valor);
+        } catch (e) {
+            return "";
+        }
+        if (url.protocol !== "https:" && url.protocol !== "http:") { return ""; }
+
+        const host = url.hostname.toLowerCase();
+        let id = "";
+        if (host === "youtu.be") {
+            id = url.pathname.split("/").filter(Boolean)[0] || "";
+        } else if (["youtube.com", "www.youtube.com", "m.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(host)) {
+            if (url.pathname === "/watch") {
+                id = url.searchParams.get("v") || "";
+            } else {
+                const correspondencia = url.pathname.match(/^\/(?:embed|shorts|live)\/([A-Za-z0-9_-]{11})(?:\/|$)/);
+                id = correspondencia ? correspondencia[1] : "";
+            }
+        }
+        return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+    }
+
+    function erroNaListaDeVideos(videos, rotacoes) {
+        if (!Array.isArray(videos)) { return "A lista de vídeos é inválida."; }
+        if (rotacoes !== undefined && (!Array.isArray(rotacoes) || rotacoes.length !== videos.length)) {
+            return "A lista de rotações dos vídeos é inválida.";
+        }
+
+        let tamanhoTotal = 0;
+        for (let i = 0; i < videos.length; i++) {
+            const video = videos[i];
+            if (video && typeof video.youtubeId === "string") {
+                if (extrairIdYoutube("https://youtu.be/" + video.youtubeId) !== video.youtubeId) {
+                    return "Um dos vídeos do YouTube é inválido.";
+                }
+                continue;
+            }
+            const src = typeof video === "string" ? video : video && video.video;
+            if (typeof src !== "string") { return "Um dos vídeos enviados é inválido."; }
+            const rotacao = typeof video === "string" ? (rotacoes ? rotacoes[i] : 0) : video.rotacao;
+            if (![0, 90, 180, 270].includes(rotacao)) {
+                return "A rotação de um dos vídeos é inválida.";
+            }
+            const correspondencia = /^data:video\/(mp4|webm);base64,([A-Za-z0-9+/]*={0,2})$/.exec(src);
+            if (!correspondencia) { return "Use vídeos MP4 ou WebM válidos."; }
+            const payload = correspondencia[2];
+            if (!payload || payload.length % 4 !== 0) { return "Um dos vídeos enviados está corrompido."; }
+            const preenchimento = payload.endsWith("==") ? 2 : (payload.endsWith("=") ? 1 : 0);
+            tamanhoTotal += Math.floor(payload.length * 3 / 4) - preenchimento;
+            if (tamanhoTotal > LIMITE_VIDEOS_BYTES) {
+                return "O tamanho total dos vídeos por obra não pode passar de 8 MB.";
+            }
+        }
+
+        return "";
+    }
+
+    function combinarMidias(imagens, videos, rotacoes) {
+        const midiasVideo = videos.map(function (video, i) {
+            if (video && typeof video.youtubeId === "string") {
+                return { youtubeId: video.youtubeId };
+            }
+            if (typeof video !== "string") {
+                return { video: video.video, rotacao: video.rotacao };
+            }
+            const rotacao = rotacoes ? rotacoes[i] : 0;
+            return rotacao ? { video: video, rotacao: rotacao } : video;
+        });
+        return (Array.isArray(imagens) ? imagens : []).concat(midiasVideo);
     }
 
     function limparNota(n) {
@@ -76,12 +151,23 @@ module.exports = function (app, conexao) {
         res.status(500).json({ mensagem: msg });
     }
 
+    function erroAoSalvarAnotacao(res, e, msg) {
+        if (e && e.code === "ER_DATA_TOO_LONG") {
+            console.error(msg, e);
+            return res.status(500).json({
+                mensagem: "A coluna anotacao.imagens não comporta esta imagem. Altere essa coluna para LONGTEXT no MySQL e tente novamente."
+            });
+        }
+        return erro(res, e, msg);
+    }
+
 
     // -------------------------------------------------
     // CONVERSÃO DE LINHAS DO BANCO → JSON DA INTERFACE
     // -------------------------------------------------
 
-    function montarItem(l, generos) {
+    function montarItem(l, generos, incluirVideos) {
+        const midias = lerLista(l.imagens);
         return {
             id: l.id_item,
             status: l.status,
@@ -93,7 +179,20 @@ module.exports = function (app, conexao) {
             citacoes: l.citacoes || "",
             favorito: !!l.favorito,
             dataAdicionado: dataParaTexto(l.data_adicionado),
-            imagens: lerLista(l.imagens),
+            imagens: midias.filter(function (midia) {
+                return typeof midia === "string" && !midia.startsWith("data:video/");
+            }),
+            videos: incluirVideos ? midias.filter(function (midia) {
+                return typeof midia === "string" && midia.startsWith("data:video/") ||
+                    midia && typeof midia.youtubeId === "string" ||
+                    midia && typeof midia.video === "string" && midia.video.startsWith("data:video/");
+            }).map(function (midia) {
+                if (midia && typeof midia.youtubeId === "string") {
+                    return { youtubeId: midia.youtubeId };
+                }
+                return typeof midia === "string" ? { video: midia, rotacao: 0 } :
+                    { video: midia.video, rotacao: [0, 90, 180, 270].includes(midia.rotacao) ? midia.rotacao : 0 };
+            }) : [],
             totalAnotacoes: l.total_anotacoes || 0,
             obra: {
                 id: l.id_obra,
@@ -214,6 +313,40 @@ module.exports = function (app, conexao) {
             WHERE d.id_usuario = ?
         `, [idUsuario]);
 
+        const [midiasItens] = await db.query(`
+            SELECT i.imagens
+            FROM item_diario i
+            JOIN diario d ON d.id_diario = i.id_diario
+            WHERE d.id_usuario = ?
+        `, [idUsuario]);
+
+        const [midiasAnotacoes] = await db.query(`
+            SELECT n.imagens
+            FROM anotacao n
+            JOIN item_diario i ON i.id_item = n.id_item
+            JOIN diario d ON d.id_diario = i.id_diario
+            WHERE d.id_usuario = ?
+        `, [idUsuario]);
+
+        let totalImagens = 0;
+        let totalVideos = 0;
+        midiasItens.forEach(function (linha) {
+            lerLista(linha.imagens).forEach(function (midia) {
+                if (typeof midia === "string" && midia.startsWith("data:video/") ||
+                    midia && typeof midia.video === "string" && midia.video.startsWith("data:video/") ||
+                    midia && typeof midia.youtubeId === "string") {
+                    totalVideos += 1;
+                } else if (typeof midia === "string") {
+                    totalImagens += 1;
+                }
+            });
+        });
+        midiasAnotacoes.forEach(function (linha) {
+            totalImagens += lerLista(linha.imagens).filter(function (imagem) {
+                return typeof imagem === "string";
+            }).length;
+        });
+
         const [datas] = await db.query(`
             SELECT n.data AS dia FROM anotacao n
             JOIN item_diario i ON i.id_item = n.id_item
@@ -236,6 +369,8 @@ module.exports = function (app, conexao) {
             favoritos: Number(r.favoritos),
             tipos: Number(r.tipos),
             anotacoes: Number(a.anotacoes),
+            imagens: totalImagens,
+            videos: totalVideos,
             sequencia: Def.maiorSequencia(datas.map(function (l) { return dataParaTexto(l.dia); }))
         };
     }
@@ -409,9 +544,37 @@ module.exports = function (app, conexao) {
 
             const generos = await generosDasObras(linhas.map(function (l) { return l.id_obra; }));
 
-            res.json(linhas.map(function (l) { return montarItem(l, generos[l.id_obra]); }));
+            res.json(linhas.map(function (l) { return montarItem(l, generos[l.id_obra], false); }));
         } catch (e) {
             erro(res, e, "Erro ao carregar o diário.");
+        }
+    });
+
+    app.get("/diario/:idUsuario/videos", async (req, res) => {
+        try {
+            const [linhas] = await db.query(
+                `SELECT i.imagens, o.titulo
+                 FROM item_diario i
+                 JOIN obra o ON o.id_obra = i.id_obra
+                 JOIN diario d ON d.id_diario = i.id_diario
+                 WHERE d.id_usuario = ?
+                 ORDER BY i.id_item DESC`, [Number(req.params.idUsuario)]);
+
+            const videos = linhas.reduce(function (resultado, linha) {
+                lerLista(linha.imagens).forEach(function (midia) {
+                    if (midia && typeof midia.youtubeId === "string") {
+                        resultado.push({ youtubeId: midia.youtubeId, titulo: linha.titulo });
+                    } else if (typeof midia === "string" && midia.startsWith("data:video/")) {
+                        resultado.push({ video: midia, rotacao: 0, titulo: linha.titulo });
+                    } else if (midia && typeof midia.video === "string" && midia.video.startsWith("data:video/")) {
+                        resultado.push({ video: midia.video, rotacao: [0, 90, 180, 270].includes(midia.rotacao) ? midia.rotacao : 0, titulo: linha.titulo });
+                    }
+                });
+                return resultado;
+            }, []);
+            res.json(videos);
+        } catch (e) {
+            erro(res, e, "Erro ao carregar os vídeos do diário.");
         }
     });
 
@@ -434,7 +597,7 @@ module.exports = function (app, conexao) {
                 "SELECT * FROM anotacao WHERE id_item = ? ORDER BY data DESC, id_anotacao DESC", [idItem]);
 
             res.json({
-                item: montarItem(linhas[0], generos[linhas[0].id_obra]),
+                item: montarItem(linhas[0], generos[linhas[0].id_obra], true),
                 anotacoes: anot.map(montarAnotacao)
             });
         } catch (e) {
@@ -458,6 +621,10 @@ module.exports = function (app, conexao) {
             if (!STATUS_VALIDOS.includes(b.status)) {
                 return res.status(400).json({ mensagem: "Escolha o status da obra." });
             }
+            const erroVideos = erroNaListaDeVideos(b.videos || [], b.rotacoesVideos);
+            if (erroVideos) {
+                return res.status(400).json({ mensagem: erroVideos });
+            }
 
             const idDiario = await diarioDoUsuario(idUsuario);
             const idTipo = await tipoPorNome(o.tipo);
@@ -476,7 +643,7 @@ module.exports = function (app, conexao) {
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
                 [idDiario, obra.insertId, limparNota(b.nota), b.status,
                  vazioParaNulo(b.dataInicio), vazioParaNulo(b.dataConclusao),
-                 JSON.stringify(b.imagens || []), vazioParaNulo(b.texto),
+                 JSON.stringify(combinarMidias(b.imagens, b.videos || [], b.rotacoesVideos)), vazioParaNulo(b.texto),
                  vazioParaNulo(b.melhoresMomentos), vazioParaNulo(b.citacoes),
                  b.favorito ? 1 : 0]);
 
@@ -518,6 +685,10 @@ module.exports = function (app, conexao) {
             if (!STATUS_VALIDOS.includes(b.status)) {
                 return res.status(400).json({ mensagem: "Escolha o status da obra." });
             }
+            const erroVideos = erroNaListaDeVideos(b.videos || [], b.rotacoesVideos);
+            if (erroVideos) {
+                return res.status(400).json({ mensagem: erroVideos });
+            }
 
             const idObra = achado[0].id_obra;
             const idTipo = await tipoPorNome(o.tipo);
@@ -534,7 +705,7 @@ module.exports = function (app, conexao) {
                  imagens = ?, texto = ?, melhores_momentos = ?, citacoes = ?, favorito = ?
                  WHERE id_item = ?`,
                 [limparNota(b.nota), b.status, vazioParaNulo(b.dataInicio),
-                 vazioParaNulo(b.dataConclusao), JSON.stringify(b.imagens || []),
+                 vazioParaNulo(b.dataConclusao), JSON.stringify(combinarMidias(b.imagens, b.videos || [], b.rotacoesVideos)),
                  vazioParaNulo(b.texto), vazioParaNulo(b.melhoresMomentos),
                  vazioParaNulo(b.citacoes), b.favorito ? 1 : 0, idItem]);
 
@@ -658,7 +829,7 @@ module.exports = function (app, conexao) {
                 xp: progresso.xp
             });
         } catch (e) {
-            erro(res, e, "Erro ao salvar a anotação.");
+            erroAoSalvarAnotacao(res, e, "Erro ao salvar a anotação.");
         }
     });
 
@@ -686,7 +857,7 @@ module.exports = function (app, conexao) {
             const progresso = await atualizarProgresso(idUsuario);
             res.json({ mensagem: "Anotação atualizada!", novasConquistas: progresso.novas, xp: progresso.xp });
         } catch (e) {
-            erro(res, e, "Erro ao atualizar a anotação.");
+            erroAoSalvarAnotacao(res, e, "Erro ao atualizar a anotação.");
         }
     });
 

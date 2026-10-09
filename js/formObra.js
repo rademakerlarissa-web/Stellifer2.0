@@ -23,6 +23,43 @@
     let imagensEmProcessamento = false;
     let capaEmProcessamento = false;
 
+    function normalizarVideos(videos) {
+        return videos.map(function (video) {
+            if (typeof video === "string") { return { video: video, rotacao: 0 }; }
+            if (video && typeof video.youtubeId === "string") {
+                return { youtubeId: video.youtubeId };
+            }
+            return {
+                video: video.video,
+                rotacao: [0, 90, 180, 270].includes(video.rotacao) ? video.rotacao : 0
+            };
+        });
+    }
+
+    function extrairIdYoutube(valor) {
+        let url;
+        try {
+            url = new URL(valor.trim());
+        } catch (erro) {
+            return "";
+        }
+        if (url.protocol !== "https:" && url.protocol !== "http:") { return ""; }
+
+        const host = url.hostname.toLowerCase();
+        let id = "";
+        if (host === "youtu.be") {
+            id = url.pathname.split("/").filter(Boolean)[0] || "";
+        } else if (["youtube.com", "www.youtube.com", "m.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(host)) {
+            if (url.pathname === "/watch") {
+                id = url.searchParams.get("v") || "";
+            } else {
+                const correspondencia = url.pathname.match(/^\/(?:embed|shorts|live)\/([A-Za-z0-9_-]{11})(?:\/|$)/);
+                id = correspondencia ? correspondencia[1] : "";
+            }
+        }
+        return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+    }
+
     function abrirBancoRascunhos() {
         if (dbRascunhos) { return dbRascunhos; }
 
@@ -179,6 +216,7 @@
             nota: estado.nota,
             capa: estado.capa,
             imagens: estado.imagens.slice(),
+            videos: estado.videos.slice(),
             formulario: {
                 titulo: campo("fo-titulo-obra").value,
                 tipo: campo("fo-tipo").value,
@@ -251,12 +289,14 @@
         estado.nota = rascunho.nota || null;
         estado.capa = rascunho.capa || "";
         estado.imagens = Array.isArray(rascunho.imagens) ? rascunho.imagens : [];
+        estado.videos = normalizarVideos(Array.isArray(rascunho.videos) ? rascunho.videos : []);
         renderizarItens("fo-generos", "generos");
         renderizarItens("fo-momentos", "momentos");
         renderizarItens("fo-citacoes", "citacoes");
         desenharNota();
         desenharCapa();
         desenharImagens();
+        desenharVideos();
         campo("fo-rascunho-status").textContent = "Rascunho recuperado automaticamente.";
     }
 
@@ -351,6 +391,16 @@
                     '<label class="botao-arquivo">🖼️ Adicionar imagens' +
                     '<input type="file" id="fo-imagens" accept="image/*" multiple></label>' +
                     '<div class="previa-imagens" id="fo-previa"></div>' +
+                '</div>' +
+
+                '<div class="campo"><span class="rotulo">Vídeos</span>' +
+                    '<label for="fo-video-youtube">Link do YouTube</label>' +
+                    '<div class="campos-linha">' +
+                        '<input type="url" id="fo-video-youtube" placeholder="https://www.youtube.com/watch?v=..." autocomplete="url">' +
+                        '<button type="button" class="botao botao-suave" id="fo-video-adicionar">Adicionar vídeo</button>' +
+                    '</div>' +
+                    '<small>O Stellifer guarda apenas o identificador do vídeo; o conteúdo é reproduzido pelo YouTube.</small>' +
+                    '<div class="previa-imagens" id="fo-videos-previa"></div>' +
                 '</div>' +
 
                 '<small id="fo-rascunho-status" role="status" aria-live="polite"></small>' +
@@ -481,6 +531,50 @@
             agendarSalvamentoRascunho();
         });
 
+        function adicionarVideoYoutube() {
+            const entrada = campo("fo-video-youtube");
+            const youtubeId = extrairIdYoutube(entrada.value);
+            if (!youtubeId) {
+                mostrarErro("Informe um link válido de vídeo do YouTube.");
+                entrada.focus();
+                return;
+            }
+            if (estado.videos.some(function (video) { return video.youtubeId === youtubeId; })) {
+                mostrarErro("Esse vídeo já foi adicionado à obra.");
+                entrada.focus();
+                return;
+            }
+            estado.videos.push({ youtubeId: youtubeId });
+            entrada.value = "";
+            campo("fo-erro").classList.remove("visivel");
+            desenharVideos();
+            agendarSalvamentoRascunho();
+        }
+
+        dialogo.querySelector("#fo-video-adicionar").addEventListener("click", adicionarVideoYoutube);
+        campo("fo-video-youtube").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                adicionarVideoYoutube();
+            }
+        });
+
+        dialogo.querySelector("#fo-videos-previa").addEventListener("click", function (e) {
+            const botao = e.target.closest("button[data-video-i]");
+            if (!botao) { return; }
+            if (botao.hasAttribute("data-rotacionar")) {
+                const video = estado.videos[Number(botao.dataset.videoI)];
+                if (!video || !video.video) { return; }
+                video.rotacao = (video.rotacao + 90) % 360;
+                desenharVideos();
+                agendarSalvamentoRascunho();
+                return;
+            }
+            estado.videos.splice(Number(botao.dataset.videoI), 1);
+            desenharVideos();
+            agendarSalvamentoRascunho();
+        });
+
         dialogo.querySelector("#fo-form").addEventListener("input", agendarSalvamentoRascunho);
         dialogo.querySelector("#fo-form").addEventListener("change", agendarSalvamentoRascunho);
         dialogo.querySelector("#fo-form").addEventListener("submit", salvar);
@@ -548,12 +642,28 @@
         campo("fo-previa").innerHTML = imagens + carregando;
     }
 
+    function desenharVideos() {
+        campo("fo-videos-previa").innerHTML = estado.videos.map(function (video, i) {
+            if (video.youtubeId) {
+                return '<div class="previa previa-video-link"><span aria-hidden="true">▶</span>' +
+                    '<span>Vídeo do YouTube · ' + esc(video.youtubeId) + '</span>' +
+                    '<button type="button" data-video-i="' + i +
+                    '" aria-label="Remover vídeo do YouTube ' + (i + 1) + '">✕</button></div>';
+            }
+            return '<div class="previa previa-video"><video src="' + esc(video.video) +
+                '" style="transform:rotate(' + video.rotacao + 'deg)" muted preload="metadata" aria-label="Prévia do vídeo ' + (i + 1) + '"></video>' +
+                '<button type="button" data-video-i="' + i + '" data-rotacionar aria-label="Girar vídeo ' + (i + 1) + ' 90 graus" title="Girar 90°">↻</button>' +
+                '<button type="button" data-video-i="' + i +
+                '" aria-label="Remover vídeo ' + (i + 1) + '">✕</button></div>';
+        }).join("");
+    }
+
     async function salvar(e) {
         e.preventDefault();
 
         campo("fo-erro").classList.remove("visivel");
         if (imagensEmProcessamento || capaEmProcessamento) {
-            mostrarErro("Aguarde as imagens terminarem de carregar.");
+            mostrarErro("Aguarde as mídias terminarem de carregar.");
             return;
         }
 
@@ -580,6 +690,7 @@
             melhoresMomentos: estado.momentos.join("\n"),
             citacoes: estado.citacoes.join("\n"),
             imagens: estado.imagens,
+            videos: estado.videos,
             obra: {
                 titulo: titulo,
                 tipo: tipo,
@@ -627,6 +738,7 @@
             id: item ? item.id : null,
             nota: item ? item.nota : null,
             imagens: item ? item.imagens.slice() : [],
+            videos: item && Array.isArray(item.videos) ? normalizarVideos(item.videos) : [],
             imagensPendentes: 0,
             capa: obra.capa || "",
             aoSalvar: opcoesAbrir.aoSalvar,
@@ -666,6 +778,7 @@
         desenharNota();
         desenharCapa();
         desenharImagens();
+        desenharVideos();
 
         dialogo.scrollTop = 0;
         formulario.scrollTop = 0;
@@ -692,7 +805,7 @@
                 formulario.querySelectorAll("input, select, textarea, button").forEach(function (controle) {
                     controle.disabled = false;
                 });
-                campo("fo-salvar").disabled = imagensEmProcessamento;
+                campo("fo-salvar").disabled = imagensEmProcessamento || capaEmProcessamento;
                 campo("fo-titulo-obra").focus();
             }
         }

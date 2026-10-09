@@ -32,6 +32,69 @@
         }).join("") + '</div>';
     }
 
+    function youtubeEmbedUrl(id) {
+        const parametros = new URLSearchParams({
+            playsinline: "1",
+            rel: "0",
+            modestbranding: "1"
+        });
+        if ((window.location.protocol === "http:" || window.location.protocol === "https:") &&
+            window.location.origin !== "null") {
+            parametros.set("origin", window.location.origin);
+        }
+        return "https://www.youtube.com/embed/" + encodeURIComponent(id) + "?" + parametros.toString();
+    }
+
+    function galeriaVideos(videos) {
+        if (!videos || videos.length === 0) { return ""; }
+        return '<div class="galeria-videos">' + videos.filter(function (video) {
+            return video && (typeof video.youtubeId === "string" && /^[A-Za-z0-9_-]{11}$/.test(video.youtubeId) ||
+                typeof video.video === "string");
+        }).map(function (video, i) {
+            if (video.youtubeId) {
+                return '<div class="galeria-video-frame galeria-youtube-frame">' +
+                    '<iframe src="' + esc(youtubeEmbedUrl(video.youtubeId)) +
+                    '" title="Vídeo do YouTube ' + (i + 1) +
+                    '" loading="lazy" referrerpolicy="origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>';
+            }
+            const src = typeof video === "string" ? video : video.video;
+            const rotacao = typeof video === "string" ? 0 : video.rotacao || 0;
+            return '<div class="galeria-video-frame"><video controls playsinline preload="metadata" data-rotacao="' + rotacao +
+                '" aria-label="Vídeo ' + (i + 1) + '" src="' + esc(src) + '"></video></div>';
+        }).join("") + '</div>';
+    }
+
+    function ajustarVideo(video) {
+        if (!video.videoWidth || !video.videoHeight) { return; }
+        const frame = video.parentElement;
+        const rotacao = Number(video.dataset.rotacao) || 0;
+        const girado = rotacao === 90 || rotacao === 270;
+        const larguraVisual = girado ? video.videoHeight : video.videoWidth;
+        const alturaVisual = girado ? video.videoWidth : video.videoHeight;
+        frame.style.width = "100%";
+        frame.style.height = "";
+        const larguraDisponivel = frame.clientWidth;
+        if (!larguraDisponivel) { return; }
+        const escala = Math.min(
+            larguraDisponivel / larguraVisual,
+            window.innerHeight * 0.7 / alturaVisual
+        );
+        frame.style.width = Math.round(larguraVisual * escala) + "px";
+        frame.style.height = Math.round(alturaVisual * escala) + "px";
+        video.style.width = Math.round(video.videoWidth * escala) + "px";
+        video.style.height = Math.round(video.videoHeight * escala) + "px";
+        video.style.transform = "translate(-50%, -50%) rotate(" + rotacao + "deg)";
+    }
+
+    function prepararVideos() {
+        conteudo.querySelectorAll(".galeria-video-frame video").forEach(function (video) {
+            if (!video.dataset.rotacaoPreparada) {
+                video.dataset.rotacaoPreparada = "true";
+                video.addEventListener("loadedmetadata", function () { ajustarVideo(video); });
+            }
+            if (video.readyState >= 1) { ajustarVideo(video); }
+        });
+    }
 
     // =================================================
     // DESENHO DA PÁGINA
@@ -89,7 +152,8 @@
 
         // ----- Meu registro pessoal -----
 
-        const temRegistro = item.texto || momentos.length || citacoes.length || item.imagens.length;
+        const videos = Array.isArray(item.videos) ? item.videos : [];
+        const temRegistro = item.texto || momentos.length || citacoes.length || item.imagens.length || videos.length;
 
         html += '<div class="secao"><h2>Meu registro</h2>';
 
@@ -115,6 +179,9 @@
             if (item.imagens.length) {
                 html += '<div class="bloco-texto"><h3>Imagens</h3>' + galeria(item.imagens) + '</div>';
             }
+            if (videos.length) {
+                html += '<div class="bloco-texto"><h3>Vídeos</h3>' + galeriaVideos(videos) + '</div>';
+            }
 
             html += '</div>';
         }
@@ -137,7 +204,10 @@
         html += '</div>';
 
         conteudo.innerHTML = html;
+        prepararVideos();
     }
+
+    window.addEventListener("resize", prepararVideos);
 
     function cartaoAnotacao(a) {
         return '<article class="anotacao" id="anotacao-' + a.id + '">' +
