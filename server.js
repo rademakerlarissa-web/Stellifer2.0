@@ -1,17 +1,21 @@
+//Principal arquivo do back-end do Stellifer 2.0
+//Responsável por iniciar o servidor, conectar ao MySQL e definir as rotas da API.
+
 //protegendo o MySQL com variáveis de ambiente
-require('dotenv').config();
-const mysql = require('mysql2');
+require('dotenv').config();// Importa o módulo dotenv para carregar variáveis de ambiente do arquivo .env
+const mysql = require('mysql2');// Importa o módulo mysql2 para conectar ao banco de dados MySQL
 
 
-const express = require("express");
-const cors = require("cors");
-const bcrypt = require("bcrypt");
+const express = require("express");// Importa o Express para criar o servidor
+const cors = require("cors");// Importa o CORS para permitir comunicação entre front-end e back-end
+const bcrypt = require("bcrypt");// Importa o bcrypt para criptografar senhas
 
+// Cria uma instância do Express e define a porta do servidor
 const app = express();
 const PORT = 3000;
 
 
-// Permite que o servidor receba mídias em base64 junto com os dados do diário.
+// Permite que o servidor receba dados em JSON com limite de 30MB para suportar imagens e vídeos em base64
 app.use(express.json({ limit: "30mb" }));
 
 // Permite comunicação entre o front-end e o back-end
@@ -22,6 +26,7 @@ app.use(cors());
 // CONEXÃO COM O MYSQL
 // ================================
 
+// Cria a conexão com o banco de dados MySQL usando as variáveis de ambiente
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -29,7 +34,7 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-
+// Conecta ao banco de dados MySQL e trata erros de conexão
 db.connect((erro) => {
 
     if (erro) {
@@ -81,7 +86,7 @@ app.post("/cadastro", async (req, res) => {
 
     try {
 
-        // Verifica se o nome de usuário ou e-mail já existem
+        // Verifica se o nome de usuário ou e-mail já existem no banco de dados
         const [usuarios] = await db.promise().query(
             `
             SELECT id_usuario
@@ -102,7 +107,8 @@ app.post("/cadastro", async (req, res) => {
 
 
         // Criptografa a senha
-        const senhaCriptografada = await bcrypt.hash(senha, 10);
+        const senhaCriptografada = await bcrypt.hash(senha, 10);// 10 é o número de salt rounds, que define a complexidade da criptografia
+        
 
 
         // Insere o usuário no banco

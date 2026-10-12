@@ -174,6 +174,89 @@
         });
     }
 
+    const Rascunhos = (function () {
+        let bancoRascunhos = null;
+
+        function abrirBanco() {
+            if (bancoRascunhos) { return bancoRascunhos; }
+
+            bancoRascunhos = new Promise(function (resolve, reject) {
+                const pedido = window.indexedDB.open("stellifer-rascunhos", 1);
+
+                pedido.onupgradeneeded = function () {
+                    if (!pedido.result.objectStoreNames.contains("rascunhos")) {
+                        pedido.result.createObjectStore("rascunhos", { keyPath: "chave" });
+                    }
+                };
+
+                pedido.onsuccess = function () {
+                    pedido.result.onversionchange = function () { pedido.result.close(); };
+                    resolve(pedido.result);
+                };
+
+                pedido.onerror = function () {
+                    reject(pedido.error || new Error("Não foi possível abrir o armazenamento de rascunhos."));
+                };
+
+                pedido.onblocked = function () {
+                    reject(new Error("O armazenamento de rascunhos está ocupado por outra aba."));
+                };
+            });
+
+            return bancoRascunhos;
+        }
+
+        async function ler(chave) {
+            const banco = await abrirBanco();
+
+            return new Promise(function (resolve, reject) {
+                const transacao = banco.transaction("rascunhos", "readonly");
+                const pedido = transacao.objectStore("rascunhos").get(chave);
+                pedido.onsuccess = function () { resolve(pedido.result || null); };
+                pedido.onerror = function () {
+                    reject(pedido.error || new Error("Não foi possível ler o rascunho."));
+                };
+                transacao.onabort = function () {
+                    reject(transacao.error || new Error("A leitura do rascunho foi interrompida."));
+                };
+            });
+        }
+
+        async function gravar(rascunho) {
+            const banco = await abrirBanco();
+
+            return new Promise(function (resolve, reject) {
+                const transacao = banco.transaction("rascunhos", "readwrite");
+                transacao.objectStore("rascunhos").put(rascunho);
+                transacao.oncomplete = resolve;
+                transacao.onerror = function () {
+                    reject(transacao.error || new Error("Não foi possível salvar o rascunho."));
+                };
+                transacao.onabort = function () {
+                    reject(transacao.error || new Error("O salvamento do rascunho foi interrompido."));
+                };
+            });
+        }
+
+        async function apagar(chave) {
+            const banco = await abrirBanco();
+
+            return new Promise(function (resolve, reject) {
+                const transacao = banco.transaction("rascunhos", "readwrite");
+                transacao.objectStore("rascunhos").delete(chave);
+                transacao.oncomplete = resolve;
+                transacao.onerror = function () {
+                    reject(transacao.error || new Error("Não foi possível remover o rascunho."));
+                };
+                transacao.onabort = function () {
+                    reject(transacao.error || new Error("A remoção do rascunho foi interrompida."));
+                };
+            });
+        }
+
+        return { ler: ler, gravar: gravar, apagar: apagar };
+    })();
+
     // Aviso flutuante
     function aviso(mensagem, tipo) {
         let area = document.getElementById("avisos");
@@ -846,6 +929,7 @@
         aoSalvar: aoSalvar,
         confirmar: confirmar,
         prepararJanela: prepararJanela,
+        Rascunhos: Rascunhos,
         usuario: usuario,
         exigirLogin: exigirLogin,
         sair: sair,

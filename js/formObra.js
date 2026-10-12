@@ -19,7 +19,6 @@
     let estado = null;          // { id, nota, imagens, capa, aoSalvar }
     let temporizadorRascunho = null;
     let filaRascunho = Promise.resolve();
-    let dbRascunhos = null;
     let imagensEmProcessamento = false;
     let capaEmProcessamento = false;
 
@@ -58,83 +57,6 @@
             }
         }
         return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
-    }
-
-    function abrirBancoRascunhos() {
-        if (dbRascunhos) { return dbRascunhos; }
-
-        dbRascunhos = new Promise(function (resolve, reject) {
-            const pedido = window.indexedDB.open("stellifer-rascunhos", 1);
-
-            pedido.onupgradeneeded = function () {
-                if (!pedido.result.objectStoreNames.contains("rascunhos")) {
-                    pedido.result.createObjectStore("rascunhos", { keyPath: "chave" });
-                }
-            };
-
-            pedido.onsuccess = function () {
-                pedido.result.onversionchange = function () { pedido.result.close(); };
-                resolve(pedido.result);
-            };
-
-            pedido.onerror = function () {
-                reject(pedido.error || new Error("Não foi possível abrir o armazenamento de rascunhos."));
-            };
-
-            pedido.onblocked = function () {
-                reject(new Error("O armazenamento de rascunhos está ocupado por outra aba."));
-            };
-        });
-
-        return dbRascunhos;
-    }
-
-    async function lerRascunho(chave) {
-        const banco = await abrirBancoRascunhos();
-
-        return new Promise(function (resolve, reject) {
-            const transacao = banco.transaction("rascunhos", "readonly");
-            const pedido = transacao.objectStore("rascunhos").get(chave);
-            pedido.onsuccess = function () { resolve(pedido.result || null); };
-            pedido.onerror = function () {
-                reject(pedido.error || new Error("Não foi possível ler o rascunho."));
-            };
-            transacao.onabort = function () {
-                reject(transacao.error || new Error("A leitura do rascunho foi interrompida."));
-            };
-        });
-    }
-
-    async function gravarRascunho(rascunho) {
-        const banco = await abrirBancoRascunhos();
-
-        return new Promise(function (resolve, reject) {
-            const transacao = banco.transaction("rascunhos", "readwrite");
-            transacao.objectStore("rascunhos").put(rascunho);
-            transacao.oncomplete = resolve;
-            transacao.onerror = function () {
-                reject(transacao.error || new Error("Não foi possível salvar o rascunho."));
-            };
-            transacao.onabort = function () {
-                reject(transacao.error || new Error("O salvamento do rascunho foi interrompido."));
-            };
-        });
-    }
-
-    async function apagarRascunho(chave) {
-        const banco = await abrirBancoRascunhos();
-
-        return new Promise(function (resolve, reject) {
-            const transacao = banco.transaction("rascunhos", "readwrite");
-            transacao.objectStore("rascunhos").delete(chave);
-            transacao.oncomplete = resolve;
-            transacao.onerror = function () {
-                reject(transacao.error || new Error("Não foi possível remover o rascunho."));
-            };
-            transacao.onabort = function () {
-                reject(transacao.error || new Error("A remoção do rascunho foi interrompida."));
-            };
-        });
     }
 
     function chaveDoRascunho(id) {
@@ -245,7 +167,7 @@
         status.textContent = "Salvando rascunho...";
 
         filaRascunho = filaRascunho.then(function () {
-            return gravarRascunho(rascunho);
+            return S.Rascunhos.gravar(rascunho);
         }).then(function () {
             if (estado && estado.chaveRascunho === rascunho.chave) {
                 status.textContent = "Rascunho salvo neste navegador.";
@@ -710,7 +632,7 @@
             estado.descartado = true;
             try {
                 await filaRascunho;
-                await apagarRascunho(estado.chaveRascunho);
+                await S.Rascunhos.apagar(estado.chaveRascunho);
             } catch (erroRascunho) {
                 console.error("Erro ao remover rascunho após salvar a obra:", erroRascunho);
                 campo("fo-rascunho-status").textContent =
@@ -785,7 +707,7 @@
         dialogo.showModal();
 
         try {
-            const rascunho = await lerRascunho(estado.chaveRascunho);
+            const rascunho = await S.Rascunhos.ler(estado.chaveRascunho);
             if (!dialogo.open) { return; }
             if (rascunho) {
                 restaurarRascunho(rascunho);

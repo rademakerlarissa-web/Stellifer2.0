@@ -5,10 +5,6 @@
 // Usado no server.js com:
 //     require("./rotas/stellifer")(app, conexao);
 //
-// ATENÇÃO — nomes de colunas
-// Estas rotas assumem os nomes de colunas abaixo. Se no seu
-// banco algum nome for diferente, é só ajustar aqui:
-//
 //   usuario          id_usuario, nome, nome_usuario, email, senha, foto_perfil, xp
 //   tipo             id_tipo, nome
 //   obra             id_obra, titulo, sinopse, capa, autor, id_tipo
@@ -23,7 +19,7 @@
 //   conquista        id_conquista, nome, descricao, xp
 //   usuario_conquista id_usuario, id_conquista
 //
-//   • item_diario.status precisa aceitar: 'concluida', 'em_andamento',
+//   • item_diario.status aceita: 'concluida', 'em_andamento',
 //     'abandonada' e 'quero' (quero ler/assistir).
 //   • imagens guarda um JSON com imagens, IDs do YouTube e mídias antigas → use LONGTEXT.
 //   • capa e foto_perfil podem receber imagens em base64 → use LONGTEXT.
@@ -45,6 +41,7 @@ module.exports = function (app, conexao) {
     // FUNÇÕES AUXILIARES
     // -------------------------------------------------
 
+    // Converte Date → "YYYY-MM-DD" ou string → "YYYY-MM-DD"
     function dataParaTexto(d) {
         if (!d) { return null; }
         if (typeof d === "string") { return d.slice(0, 10); }
@@ -53,6 +50,7 @@ module.exports = function (app, conexao) {
         return d.getFullYear() + "-" + m + "-" + dia;
     }
 
+    // Converte string JSON → array ou retorna [] se inválido
     function lerLista(texto) {
         if (!texto) { return []; }
         if (Array.isArray(texto)) { return texto; }
@@ -64,6 +62,7 @@ module.exports = function (app, conexao) {
         }
     }
 
+    // Extrai o ID do YouTube de uma URL
     function extrairIdYoutube(valor) {
         let url;
         try {
@@ -79,21 +78,23 @@ module.exports = function (app, conexao) {
             id = url.pathname.split("/").filter(Boolean)[0] || "";
         } else if (["youtube.com", "www.youtube.com", "m.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(host)) {
             if (url.pathname === "/watch") {
-                id = url.searchParams.get("v") || "";
+                id = url.searchParams.get("v") || "";// Exemplo: https://www.youtube.com/watch?v=ID_DO_VIDEO
             } else {
                 const correspondencia = url.pathname.match(/^\/(?:embed|shorts|live)\/([A-Za-z0-9_-]{11})(?:\/|$)/);
-                id = correspondencia ? correspondencia[1] : "";
+                id = correspondencia ? correspondencia[1] : "";// Exemplo: https://www.youtube.com/embed/ID_DO_VIDEO
             }
         }
-        return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+        return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";// ID do YouTube tem 11 caracteres
     }
 
+    // Valida a lista de vídeos e retorna uma mensagem de erro ou "" se estiver tudo certo
     function erroNaListaDeVideos(videos, rotacoes) {
         if (!Array.isArray(videos)) { return "A lista de vídeos é inválida."; }
         if (rotacoes !== undefined && (!Array.isArray(rotacoes) || rotacoes.length !== videos.length)) {
             return "A lista de rotações dos vídeos é inválida.";
         }
 
+        // Valida cada vídeo e calcula o tamanho total
         let tamanhoTotal = 0;
         for (let i = 0; i < videos.length; i++) {
             const video = videos[i];
@@ -123,6 +124,7 @@ module.exports = function (app, conexao) {
         return "";
     }
 
+    // Combina imagens e vídeos em uma única lista de mídias
     function combinarMidias(imagens, videos, rotacoes) {
         const midiasVideo = videos.map(function (video, i) {
             if (video && typeof video.youtubeId === "string") {
@@ -137,20 +139,24 @@ module.exports = function (app, conexao) {
         return (Array.isArray(imagens) ? imagens : []).concat(midiasVideo);
     }
 
+    // Limpa a nota para ser um inteiro de 1 a 5 ou null
     function limparNota(n) {
         const nota = parseInt(n, 10);
         return nota >= 1 && nota <= 5 ? nota : null;   // só inteiros de 1 a 5
     }
 
+    // Converte undefined, null ou string vazia → null
     function vazioParaNulo(v) {
         return v === undefined || v === null || String(v).trim() === "" ? null : v;
     }
 
+    // Envia erro 500 e loga no console caso ocorra algum erro
     function erro(res, e, msg) {
         console.error(msg, e);
         res.status(500).json({ mensagem: msg });
     }
 
+    // Envia erro 500 e loga no console, mas trata o caso de coluna muito pequena
     function erroAoSalvarAnotacao(res, e, msg) {
         if (e && e.code === "ER_DATA_TOO_LONG") {
             console.error(msg, e);
@@ -166,6 +172,7 @@ module.exports = function (app, conexao) {
     // CONVERSÃO DE LINHAS DO BANCO → JSON DA INTERFACE
     // -------------------------------------------------
 
+    // Monta o objeto do item do diário (obra + registro pessoal)
     function montarItem(l, generos, incluirVideos) {
         const midias = lerLista(l.imagens);
         return {

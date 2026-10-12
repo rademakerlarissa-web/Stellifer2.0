@@ -798,14 +798,13 @@ footer::after {
     box-shadow: var(--sombra);
 }
 
-.week-day .bar {
+.bar-annotations {
 
-    background: linear-gradient(to top, var(--verde-medio), var(--verde));
+    background: linear-gradient(to top, #8fca94, #b9e2bc);
 }
 
-.annotation-info {
-
-    background: var(--verde-claro);
+.bar-works {
+    background: linear-gradient(to top, #326842, #4e875d);
 }
 
 .date-selectors select,

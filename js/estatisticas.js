@@ -89,35 +89,6 @@ yearSelect.addEventListener("change", function() {
 });
 
 // =====================================================
-// FREQUÊNCIA DE ANOTAÇÕES
-// =====================================================
-
-const weekDays = document.querySelectorAll(".week-day");
-const annotationInfo = document.querySelector("#annotation-info");
-
-
-weekDays.forEach(function(day) {
-
-    day.addEventListener("click", function() {
-
-        const dayName = day.dataset.day;
-        const annotations = Number(day.dataset.annotations || 0);
-        const works = Number(day.dataset.works || 0);
-        const annotationText = annotations === 1 ? "anotação" : "anotações";
-        const workText = works === 1 ? "obra adicionada" : "obras adicionadas";
-        const heading = document.createElement("strong");
-        const detail = document.createElement("span");
-
-        heading.textContent = dayName;
-        detail.textContent = "📝 " + annotations + " " + annotationText +
-            " · 📚 " + works + " " + workText;
-        annotationInfo.replaceChildren(heading, detail);
-
-    });
-
-});
-
-// =====================================================
 // PERÍODO PERSONALIZADO
 // =====================================================
 
@@ -453,10 +424,12 @@ function updateStatistics() {
     updateStatusChart(data.status);
 
     updateHighlights(data.highlights);
+    atualizarMediaDiaria(anotacoesDaConta, itensDaConta || []);
 
 }
 
 let itensDaConta = null;
+let anotacoesDaConta = [];
 
 function usuarioComSessao() {
     try {
@@ -522,58 +495,176 @@ function estatisticasDaConta(itens) {
     return { ratings: ratings, status: status, highlights: highlights };
 }
 
-function atualizarSemanaDaConta(anotacoes, itens) {
+function dataDaAtividade(data) {
+    if (!data) { return null; }
+    const partes = String(data).slice(0, 10).split("-");
+    if (partes.length !== 3) { return null; }
+
+    const ano = Number(partes[0]);
+    const mes = Number(partes[1]);
+    const dia = Number(partes[2]);
+    const valor = Date.UTC(ano, mes - 1, dia);
+    const dataUtc = new Date(valor);
+
+    if (dataUtc.getUTCFullYear() !== ano ||
+        dataUtc.getUTCMonth() !== mes - 1 ||
+        dataUtc.getUTCDate() !== dia) {
+        return null;
+    }
+    return valor;
+}
+
+function atualizarMediaDiaria(anotacoes, itens) {
     const hoje = new Date();
-    const inicioSemana = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    inicioSemana.setDate(inicioSemana.getDate() - ((inicioSemana.getDay() + 6) % 7));
+    const hojeUtc = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const datasAnotacoes = anotacoes.map(function (anotacao) {
+        return dataDaAtividade(anotacao.data);
+    }).filter(function (data) { return data !== null; });
+    const datasObras = itens.map(function (item) {
+        return dataDaAtividade(item.dataAdicionado);
+    }).filter(function (data) { return data !== null; });
+    let inicio;
+    let fim = hojeUtc;
+    let descricao;
 
-    const contagens = [0, 0, 0, 0, 0, 0, 0];
-    const anotacoesPorDia = [0, 0, 0, 0, 0, 0, 0];
-    const obrasPorDia = [0, 0, 0, 0, 0, 0, 0];
-    anotacoes.forEach(function (anotacao) {
-        if (!anotacao.data) { return; }
-        const partes = String(anotacao.data).slice(0, 10).split("-");
-        if (partes.length !== 3) { return; }
-        const data = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
-        const diferenca = Math.floor((data - inicioSemana) / 86400000);
-        if (diferenca >= 0 && diferenca < 7) {
-            anotacoesPorDia[diferenca] += 1;
-            contagens[diferenca] += 1;
-        }
-    });
-    itens.forEach(function (item) {
-        if (!item.dataAdicionado) { return; }
-        const partes = String(item.dataAdicionado).slice(0, 10).split("-");
-        if (partes.length !== 3) { return; }
-        const data = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
-        const diferenca = Math.floor((data - inicioSemana) / 86400000);
-        if (diferenca >= 0 && diferenca < 7) {
-            obrasPorDia[diferenca] += 1;
-            contagens[diferenca] += 1;
-        }
-    });
+    if (generalButton.classList.contains("active")) {
+        const datas = datasAnotacoes.concat(datasObras)
+            .filter(function (data) { return data <= hojeUtc; });
+        inicio = datas.length ? Math.min.apply(null, datas) : null;
+        descricao = "Média diária no histórico geral";
+    } else {
+        const ano = Number(yearSelect.value);
+        const mes = Number(monthSelect.value);
+        inicio = Date.UTC(ano, mes - 1, 1);
+        fim = Math.min(Date.UTC(ano, mes, 0), hojeUtc);
+        descricao = "Média diária em " + monthNames[mes - 1] + " de " + ano;
+    }
 
-    const maximo = Math.max.apply(null, contagens);
-    weekDays.forEach(function (dia, indice) {
-        const total = contagens[indice];
-        dia.dataset.count = String(total);
-        dia.dataset.annotations = String(anotacoesPorDia[indice]);
-        dia.dataset.works = String(obrasPorDia[indice]);
-        dia.querySelector(".bar").style.height = maximo
-            ? Math.max(8, Math.round((total / maximo) * 90)) + "%"
+    const diasPorSemana = Array(7).fill(0);
+    const anotacoesPorSemana = Array(7).fill(0);
+    const obrasPorSemana = Array(7).fill(0);
+    const diasDaSemana = document.querySelectorAll(".week-day");
+    const contarNoPeriodo = function (datas) {
+        return inicio !== null && fim >= inicio
+            ? datas.filter(function (data) {
+                return data >= inicio && data <= fim;
+            }).length
+            : 0;
+    };
+    let totalAnotacoes = contarNoPeriodo(datasAnotacoes);
+    let totalObras = contarNoPeriodo(datasObras);
+    let descricaoResumo = "Total no período selecionado";
+
+    if (generalButton.classList.contains("active")) {
+        const mesesNoHistorico = inicio !== null
+            ? (hoje.getFullYear() - new Date(inicio).getUTCFullYear()) * 12 +
+                hoje.getMonth() - new Date(inicio).getUTCMonth() + 1
+            : 0;
+        totalAnotacoes = mesesNoHistorico
+            ? Math.round(totalAnotacoes / mesesNoHistorico)
+            : 0;
+        totalObras = mesesNoHistorico
+            ? Math.round(totalObras / mesesNoHistorico)
+            : 0;
+        descricaoResumo = "Média por mês no histórico geral";
+    }
+
+    const maiorTotalResumo = Math.max(totalAnotacoes, totalObras);
+    const barraAnotacoesResumo = document.querySelector("#annotation-summary-bar");
+    const barraObrasResumo = document.querySelector("#work-summary-bar");
+    document.querySelector("#annotation-total").textContent = String(totalAnotacoes);
+    document.querySelector("#work-total").textContent = String(totalObras);
+    document.querySelector("#activity-summary-description").textContent = descricaoResumo;
+    barraAnotacoesResumo.style.width = maiorTotalResumo
+        ? Math.round((totalAnotacoes / maiorTotalResumo) * 100) + "%"
+        : "0%";
+    barraObrasResumo.style.width = maiorTotalResumo
+        ? Math.round((totalObras / maiorTotalResumo) * 100) + "%"
+        : "0%";
+    barraAnotacoesResumo.style.zIndex = totalAnotacoes <= totalObras ? "2" : "1";
+    barraObrasResumo.style.zIndex = totalObras < totalAnotacoes ? "2" : "1";
+    document.querySelector(".activity-summary").setAttribute(
+        "aria-label",
+        descricaoResumo + ": " + totalAnotacoes + " anotações e " +
+            totalObras + " obras"
+    );
+
+    if (inicio !== null && fim >= inicio) {
+        for (let data = inicio; data <= fim; data += 86400000) {
+            diasPorSemana[new Date(data).getUTCDay()] += 1;
+        }
+
+        datasAnotacoes.forEach(function (data) {
+            if (data >= inicio && data <= fim) {
+                anotacoesPorSemana[new Date(data).getUTCDay()] += 1;
+            }
+        });
+        datasObras.forEach(function (data) {
+            if (data >= inicio && data <= fim) {
+                obrasPorSemana[new Date(data).getUTCDay()] += 1;
+            }
+        });
+    }
+
+    const medias = Array(7).fill(null).map(function (_, dia) {
+        return {
+            anotacoes: diasPorSemana[dia]
+                ? Math.round(anotacoesPorSemana[dia] / diasPorSemana[dia])
+                : 0,
+            obras: diasPorSemana[dia]
+                ? Math.round(obrasPorSemana[dia] / diasPorSemana[dia])
+                : 0,
+            total: diasPorSemana[dia]
+                ? (anotacoesPorSemana[dia] + obrasPorSemana[dia]) / diasPorSemana[dia]
+                : 0
+        };
+    });
+    const maiorMedia = Math.max.apply(null, medias.map(function (media) {
+        return Math.max(media.anotacoes, media.obras);
+    }));
+    const maiorTotal = Math.max.apply(null, medias.map(function (media) {
+        return media.total;
+    }));
+
+    document.querySelector("#weekly-activity-description").textContent = descricao;
+    diasDaSemana.forEach(function (dia) {
+        const indice = Number(dia.dataset.weekday);
+        const media = medias[indice];
+        const anotacoesBarra = dia.querySelector(".bar-annotations");
+        const obrasBarra = dia.querySelector(".bar-works");
+        const anotacoesValor = dia.querySelector(".weekday-annotation-value");
+        const obrasValor = dia.querySelector(".weekday-work-value");
+        const nomeDia = dia.dataset.label;
+
+        anotacoesValor.textContent = String(media.anotacoes);
+        obrasValor.textContent = String(media.obras);
+        const textoAnotacoes = media.anotacoes === 1 ? "anotação" : "anotações";
+        const textoObras = media.obras === 1 ? "obra" : "obras";
+        dia.setAttribute(
+            "aria-label",
+            nomeDia + ": média de " + media.anotacoes + " " + textoAnotacoes +
+                " e " + media.obras + " " + textoObras + " por ocorrência"
+        );
+        anotacoesBarra.style.height = maiorMedia
+            ? Math.round((media.anotacoes / maiorMedia) * 90) + "%"
             : "0%";
+        obrasBarra.style.height = maiorMedia
+            ? Math.round((media.obras / maiorMedia) * 90) + "%"
+            : "0%";
+        anotacoesBarra.style.zIndex = media.anotacoes <= media.obras ? "2" : "1";
+        obrasBarra.style.zIndex = media.obras < media.anotacoes ? "2" : "1";
+        dia.classList.toggle("is-busiest", maiorTotal > 0 && media.total === maiorTotal);
     });
 }
 
 window.atualizarResumoInicio = function (itens, anotacoes) {
     itensDaConta = itens;
+    anotacoesDaConta = anotacoes;
     updateStatistics();
-    atualizarSemanaDaConta(anotacoes, itens);
 };
 
 if (usuarioComSessao()) {
     itensDaConta = [];
-    atualizarSemanaDaConta([], []);
 }
 updateStatisticsPeriod();
 updateStatistics();

@@ -266,7 +266,7 @@
 
 
     <!-- =====================================================
-         CARD 2 - FREQUÊNCIA DE ANOTAÇÕES
+         CARD 2 - FREQUÊNCIA DE ATIVIDADES
     ====================================================== -->
 
     <div class="stat-card weekly-card">
@@ -274,114 +274,80 @@
         <h3>Frequência de atividades</h3>
 
         <p class="stat-description" id="weekly-activity-description">
-            Anotações e obras adicionadas nesta semana
+            Média de registros por dia da semana no período selecionado
         </p>
 
-
-        <div class="weekly-chart">
-
-
-            <div class="week-day"
-                 data-day="Segunda-feira"
-                 data-count="3"
-                 data-annotations="3"
-                 data-works="0">
-
-                <div class="bar" style="height: 45%;"></div>
-
-                <span>Seg</span>
-
+        <div class="weekly-chart" id="weekly-chart">
+            <div class="week-day" data-weekday="1" data-label="Segunda-feira">
+                <div class="weekday-bars" aria-hidden="true">
+                    <div class="bar bar-works"></div>
+                    <div class="bar bar-annotations"></div>
+                </div>
+                <span class="weekday-name"><span class="weekday-full">Segunda</span><span class="weekday-short">Seg</span></span>
+                <span class="weekday-values"><span class="weekday-annotation-value">0</span><span class="weekday-work-value">0</span></span>
             </div>
-
-
-            <div class="week-day"
-                 data-day="Terça-feira"
-                 data-count="5"
-                 data-annotations="5"
-                 data-works="0">
-
-                <div class="bar" style="height: 70%;"></div>
-
-                <span>Ter</span>
-
+            <div class="week-day" data-weekday="2" data-label="Terça-feira">
+                <div class="weekday-bars" aria-hidden="true">
+                    <div class="bar bar-works"></div>
+                    <div class="bar bar-annotations"></div>
+                </div>
+                <span class="weekday-name"><span class="weekday-full">Terça</span><span class="weekday-short">Ter</span></span>
+                <span class="weekday-values"><span class="weekday-annotation-value">0</span><span class="weekday-work-value">0</span></span>
             </div>
-
-
-            <div class="week-day"
-                 data-day="Quarta-feira"
-                 data-count="2"
-                 data-annotations="2"
-                 data-works="0">
-
-                <div class="bar" style="height: 35%;"></div>
-
-                <span>Qua</span>
-
+            <div class="week-day" data-weekday="3" data-label="Quarta-feira">
+                <div class="weekday-bars" aria-hidden="true">
+                    <div class="bar bar-works"></div>
+                    <div class="bar bar-annotations"></div>
+                </div>
+                <span class="weekday-name"><span class="weekday-full">Quarta</span><span class="weekday-short">Qua</span></span>
+                <span class="weekday-values"><span class="weekday-annotation-value">0</span><span class="weekday-work-value">0</span></span>
             </div>
-
-
-            <div class="week-day"
-                 data-day="Quinta-feira"
-                 data-count="7"
-                 data-annotations="7"
-                 data-works="0">
-
-                <div class="bar" style="height: 90%;"></div>
-
-                <span>Qui</span>
-
+            <div class="week-day" data-weekday="4" data-label="Quinta-feira">
+                <div class="weekday-bars" aria-hidden="true">
+                    <div class="bar bar-works"></div>
+                    <div class="bar bar-annotations"></div>
+                </div>
+                <span class="weekday-name"><span class="weekday-full">Quinta</span><span class="weekday-short">Qui</span></span>
+                <span class="weekday-values"><span class="weekday-annotation-value">0</span><span class="weekday-work-value">0</span></span>
             </div>
-
-
-            <div class="week-day"
-                 data-day="Sexta-feira"
-                 data-count="4"
-                 data-annotations="4"
-                 data-works="0">
-
-                <div class="bar" style="height: 55%;"></div>
-
-                <span>Sex</span>
-
+            <div class="week-day" data-weekday="5" data-label="Sexta-feira">
+                <div class="weekday-bars" aria-hidden="true">
+                    <div class="bar bar-works"></div>
+                    <div class="bar bar-annotations"></div>
+                </div>
+                <span class="weekday-name"><span class="weekday-full">Sexta</span><span class="weekday-short">Sex</span></span>
+                <span class="weekday-values"><span class="weekday-annotation-value">0</span><span class="weekday-work-value">0</span></span>
             </div>
-
-
-            <div class="week-day"
-                 data-day="Sábado"
-                 data-count="6"
-                 data-annotations="6"
-                 data-works="0">
-
-                <div class="bar" style="height: 75%;"></div>
-
-                <span>Sáb</span>
-
+            <div class="week-day" data-weekday="6" data-label="Sábado">
+                <div class="weekday-bars" aria-hidden="true">
+                    <div class="bar bar-works"></div>
+                    <div class="bar bar-annotations"></div>
+                </div>
+                <span class="weekday-name"><span class="weekday-full">Sábado</span><span class="weekday-short">Sáb</span></span>
+                <span class="weekday-values"><span class="weekday-annotation-value">0</span><span class="weekday-work-value">0</span></span>
             </div>
-
-
-            <div class="week-day"
-                 data-day="Domingo"
-                 data-count="1"
-                 data-annotations="1"
-                 data-works="0">
-
-                <div class="bar" style="height: 25%;"></div>
-
-                <span>Dom</span>
-
+            <div class="week-day" data-weekday="0" data-label="Domingo">
+                <div class="weekday-bars" aria-hidden="true">
+                    <div class="bar bar-works"></div>
+                    <div class="bar bar-annotations"></div>
+                </div>
+                <span class="weekday-name"><span class="weekday-full">Domingo</span><span class="weekday-short">Dom</span></span>
+                <span class="weekday-values"><span class="weekday-annotation-value">0</span><span class="weekday-work-value">0</span></span>
             </div>
-
         </div>
 
+        <div class="activity-legend" aria-label="Legenda do gráfico">
+            <span><i class="legend-annotations"></i>Anotações <strong id="annotation-total">0</strong></span>
+            <span><i class="legend-works"></i>Obras <strong id="work-total">0</strong></span>
+            <span><i class="legend-busiest"></i>Dia com mais registros</span>
+        </div>
 
-        <div class="annotation-info" id="annotation-info">
-
-            <strong>Selecione um dia</strong>
-
-            <span>
-                para ver anotações e obras adicionadas
-            </span>
-
+        <div class="activity-summary" role="img" aria-label="Resumo das anotações e obras">
+            <div class="activity-summary-bars" aria-hidden="true">
+                <div class="activity-summary-bar bar-works" id="work-summary-bar"></div>
+                <div class="activity-summary-bar bar-annotations" id="annotation-summary-bar"></div>
+            </div>
+            <p id="activity-summary-description">Total no período selecionado</p>
         </div>
 
     </div>

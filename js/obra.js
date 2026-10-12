@@ -17,6 +17,8 @@
     let dados = null;               // { item, anotacoes }
     let dialogoAnotacao = null;
     let estado = null;              // anotação sendo editada
+    let temporizadorRascunhoAnotacao = null;
+    let filaRascunhoAnotacao = Promise.resolve();
     let rolou = false;
 
 
@@ -266,6 +268,8 @@
                 '<label class="botao-arquivo">🖼️ Adicionar imagens<input type="file" id="an-imagens" accept="image/*" multiple></label>' +
                 '<div class="previa-imagens" id="an-previa"></div></div>' +
 
+                '<small id="an-rascunho-status" role="status" aria-live="polite"></small>' +
+
                 '<div class="janela-acoes">' +
                     '<button type="button" class="botao botao-suave" id="an-cancelar">Cancelar</button>' +
                     '<button type="submit" class="botao" id="an-salvar">Salvar anotação</button>' +
@@ -296,10 +300,19 @@
             if (!b) { return; }
             estado.nota = b.classList.contains("limpar") ? null : Number(b.dataset.valor);
             desenharNotaAnotacao();
+            agendarSalvamentoRascunhoAnotacao();
         });
 
         dialogoAnotacao.querySelector("#an-fechar").addEventListener("click", function () { dialogoAnotacao.close(); });
         dialogoAnotacao.querySelector("#an-cancelar").addEventListener("click", function () { dialogoAnotacao.close(); });
+        dialogoAnotacao.addEventListener("close", function () {
+            if (!estado || estado.descartado || estado.salvando) { return; }
+            window.clearTimeout(temporizadorRascunhoAnotacao);
+            salvarRascunhoAnotacao();
+        });
+        dialogoAnotacao.addEventListener("cancel", function (e) {
+            if (estado && (estado.abrindo || estado.salvando)) { e.preventDefault(); }
+        });
 
         dialogoAnotacao.querySelector("#an-imagens").addEventListener("change", async function (e) {
             for (const arquivo of Array.from(e.target.files)) {
@@ -311,6 +324,7 @@
             }
             desenharImagensAnotacao();
             e.target.value = "";
+            agendarSalvamentoRascunhoAnotacao();
         });
 
         dialogoAnotacao.querySelector("#an-previa").addEventListener("click", function (e) {
@@ -318,8 +332,11 @@
             if (!b) { return; }
             estado.imagens.splice(Number(b.dataset.i), 1);
             desenharImagensAnotacao();
+            agendarSalvamentoRascunhoAnotacao();
         });
 
+        dialogoAnotacao.querySelector("#an-form").addEventListener("input", agendarSalvamentoRascunhoAnotacao);
+        dialogoAnotacao.querySelector("#an-form").addEventListener("change", agendarSalvamentoRascunhoAnotacao);
         dialogoAnotacao.querySelector("#an-form").addEventListener("submit", salvarAnotacao);
     }
 
@@ -345,18 +362,104 @@
         }).join("");
     }
 
-    function abrirAnotacao(anotacao) {
+    function chaveRascunhoAnotacao(idAnotacao) {
+        const usuario = S.usuario();
+        return String(usuario ? usuario.id_usuario : "visitante") + ":anotacao:" +
+            idItem + ":" + (idAnotacao || "nova");
+    }
+
+    function capturarRascunhoAnotacao() {
+        return {
+            chave: estado.chaveRascunho,
+            atualizadoEm: Date.now(),
+            nota: estado.nota,
+            imagens: estado.imagens.slice(),
+            formulario: {
+                episodio: an("an-episodio").value,
+                data: an("an-data").value,
+                titulo: an("an-titulo").value,
+                texto: an("an-texto").value
+            }
+        };
+    }
+
+    function rascunhoAnotacaoTemConteudo(rascunho) {
+        const f = rascunho.formulario;
+        return Boolean(f.episodio.trim() || f.titulo.trim() || f.texto.trim() ||
+            rascunho.nota || rascunho.imagens.length);
+    }
+
+    function salvarRascunhoAnotacao() {
+        if (!estado || estado.descartado || estado.abrindo || !estado.chaveRascunho) {
+            return filaRascunhoAnotacao;
+        }
+
+        const rascunho = capturarRascunhoAnotacao();
+        const status = an("an-rascunho-status");
+        status.textContent = "Salvando rascunho...";
+
+        filaRascunhoAnotacao = filaRascunhoAnotacao.then(function () {
+            return rascunhoAnotacaoTemConteudo(rascunho)
+                ? S.Rascunhos.gravar(rascunho)
+                : S.Rascunhos.apagar(rascunho.chave);
+        }).then(function () {
+            if (estado && estado.chaveRascunho === rascunho.chave) {
+                status.textContent = rascunhoAnotacaoTemConteudo(rascunho)
+                    ? "Rascunho salvo neste navegador."
+                    : "";
+                estado.erroRascunhoNotificado = false;
+            }
+        }).catch(function (erro) {
+            console.error("Erro ao salvar rascunho da anotação:", erro);
+            if (estado && estado.chaveRascunho === rascunho.chave) {
+                status.textContent = "Não foi possível salvar o rascunho: " + erro.message;
+                if (!estado.erroRascunhoNotificado) {
+                    estado.erroRascunhoNotificado = true;
+                    S.aviso("Não foi possível salvar o rascunho da anotação neste navegador.", "erro");
+                }
+            }
+        });
+        return filaRascunhoAnotacao;
+    }
+
+    function agendarSalvamentoRascunhoAnotacao() {
+        if (!estado || estado.abrindo || estado.salvando || estado.descartado) { return; }
+        window.clearTimeout(temporizadorRascunhoAnotacao);
+        temporizadorRascunhoAnotacao = window.setTimeout(salvarRascunhoAnotacao, 400);
+    }
+
+    function restaurarRascunhoAnotacao(rascunho) {
+        const f = rascunho.formulario || {};
+        an("an-episodio").value = f.episodio || "";
+        an("an-data").value = f.data || "";
+        an("an-titulo").value = f.titulo || "";
+        an("an-texto").value = f.texto || "";
+        estado.nota = rascunho.nota || null;
+        estado.imagens = Array.isArray(rascunho.imagens) ? rascunho.imagens : [];
+        desenharNotaAnotacao();
+        desenharImagensAnotacao();
+        an("an-rascunho-status").textContent = "Rascunho recuperado automaticamente.";
+    }
+
+    async function abrirAnotacao(anotacao) {
 
         if (!dialogoAnotacao) { criarDialogoAnotacao(); }
 
         estado = {
             id: anotacao ? anotacao.id : null,
             nota: anotacao ? anotacao.nota : null,
-            imagens: anotacao ? anotacao.imagens.slice() : []
+            imagens: anotacao ? anotacao.imagens.slice() : [],
+            chaveRascunho: chaveRascunhoAnotacao(anotacao ? anotacao.id : null),
+            descartado: false,
+            abrindo: true,
+            salvando: false,
+            erroRascunhoNotificado: false
         };
 
+        const abertura = estado;
         an("an-titulo-janela").textContent = anotacao ? "Editar anotação" : "Nova anotação";
         an("an-erro").classList.remove("visivel");
+        an("an-rascunho-status").textContent = "Procurando um rascunho salvo...";
         an("an-episodio").value = anotacao ? anotacao.episodio : "";
         an("an-data").value = anotacao ? (anotacao.data || "") : S.hoje();
         an("an-titulo").value = anotacao ? anotacao.titulo : "";
@@ -365,8 +468,37 @@
         desenharNotaAnotacao();
         desenharImagensAnotacao();
 
+        const formulario = an("an-form");
+        formulario.querySelectorAll("input, textarea, button").forEach(function (controle) {
+            controle.disabled = true;
+        });
         dialogoAnotacao.showModal();
-        an("an-episodio").focus();
+
+        try {
+            await filaRascunhoAnotacao;
+            if (!dialogoAnotacao.open || estado !== abertura) { return; }
+            const rascunho = await S.Rascunhos.ler(abertura.chaveRascunho);
+            if (!dialogoAnotacao.open || estado !== abertura) { return; }
+            if (rascunho) {
+                restaurarRascunhoAnotacao(rascunho);
+            } else {
+                an("an-rascunho-status").textContent = "";
+            }
+        } catch (erro) {
+            console.error("Erro ao recuperar rascunho da anotação:", erro);
+            if (dialogoAnotacao.open && estado === abertura) {
+                an("an-rascunho-status").textContent = "Rascunhos indisponíveis: " + erro.message;
+                S.aviso("Não foi possível acessar os rascunhos neste navegador.", "erro");
+            }
+        } finally {
+            if (dialogoAnotacao.open && estado === abertura) {
+                abertura.abrindo = false;
+                formulario.querySelectorAll("input, textarea, button").forEach(function (controle) {
+                    controle.disabled = false;
+                });
+                an("an-episodio").focus();
+            }
+        }
     }
 
     async function salvarAnotacao(e) {
@@ -382,18 +514,34 @@
         }
 
         const botao = an("an-salvar");
-        botao.disabled = true;
+        const formulario = an("an-form");
+        const estadoSalvo = estado;
+        const dadosAnotacao = {
+            episodio: an("an-episodio").value.trim(),
+            data: an("an-data").value || null,
+            nota: estadoSalvo.nota,
+            titulo: titulo,
+            texto: texto,
+            imagens: estadoSalvo.imagens.slice()
+        };
+        window.clearTimeout(temporizadorRascunhoAnotacao);
+        estadoSalvo.salvando = true;
+        formulario.querySelectorAll("input, textarea, button").forEach(function (controle) {
+            controle.disabled = true;
+        });
 
         try {
-            const resposta = await S.Store.salvarAnotacao(idItem, {
-                episodio: an("an-episodio").value.trim(),
-                data: an("an-data").value || null,
-                nota: estado.nota,
-                titulo: titulo,
-                texto: texto,
-                imagens: estado.imagens
-            }, estado.id);
+            await salvarRascunhoAnotacao();
+            const resposta = await S.Store.salvarAnotacao(idItem, dadosAnotacao, estadoSalvo.id);
 
+            estadoSalvo.descartado = true;
+            try {
+                await filaRascunhoAnotacao;
+                await S.Rascunhos.apagar(estadoSalvo.chaveRascunho);
+            } catch (erroRascunho) {
+                console.error("Erro ao remover rascunho após salvar a anotação:", erroRascunho);
+                S.aviso("A anotação foi salva, mas não foi possível limpar o rascunho local.", "erro");
+            }
             S.aoSalvar(resposta);
             S.aviso(resposta.mensagem || "Anotação guardada!");
             dialogoAnotacao.close();
@@ -401,7 +549,15 @@
         } catch (erro) {
             erroAnotacao(erro.message || "Não foi possível salvar.");
         } finally {
-            botao.disabled = false;
+            if (estado === estadoSalvo) {
+                estadoSalvo.salvando = false;
+                if (dialogoAnotacao.open) {
+                    formulario.querySelectorAll("input, textarea, button").forEach(function (controle) {
+                        controle.disabled = false;
+                    });
+                    botao.disabled = false;
+                }
+            }
         }
     }
 

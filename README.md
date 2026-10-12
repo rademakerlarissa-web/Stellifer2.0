@@ -112,6 +112,8 @@ O usuário também pode registrar suas próprias impressões sobre as obras.
 - citações marcantes;
 - imagens relacionadas à obra.
 
+As anotações são salvas automaticamente como rascunhos neste navegador enquanto você escreve e são recuperadas ao abrir novamente o formulário. Ao salvar a anotação, o rascunho local é removido.
+
 Dessa forma, o Stellifer funciona não apenas como um catálogo, mas também como um espaço para registrar as experiências e lembranças associadas a cada história.
 
 ![Anotações e citações](docs/screenshots/anotacoes.png)
