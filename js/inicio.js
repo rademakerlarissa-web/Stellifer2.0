@@ -166,6 +166,7 @@
         const videos = videosInicio.slice();
         const citacoesInicio = [];
         const usadas = new Set();
+        const citacoesUsadas = new Set();
         const gruposPorObra = new Map();
         const grupos = [];
 
@@ -194,11 +195,16 @@
         function adicionarImagem(grupo, src, alt) {
             if (typeof src !== "string" || !src.trim() || usadas.has(src)) { return; }
             usadas.add(src);
-            const indice = grupo.imagens.length;
+            const citacao = grupo.citacoes.find(function (item) {
+                const chave = item.normalize("NFC").replace(/\s+/g, " ").toLocaleLowerCase();
+                if (citacoesUsadas.has(chave)) { return false; }
+                citacoesUsadas.add(chave);
+                return true;
+            }) || "";
             grupo.imagens.push({
                 imagem: src,
                 alt: alt,
-                citacao: grupo.citacoes.length ? grupo.citacoes[indice % grupo.citacoes.length] : "",
+                citacao: citacao,
                 obra: grupo.titulo
             });
         }
